@@ -1,0 +1,2 @@
+disini berisi controller untuk mapping data
+mudahnya CRUD ada disini
