@@ -14,11 +14,13 @@ datasource db {
 
 // Model for storing menfess messages
 model Menfess {
-  id         Int      @id @default(autoincrement())
-  message    String   @map("message")
-  recipient  String   @map("recipient")
-  song       String   @map("song")
-  createdAt  DateTime @default(now()) @map("created_at")
+  id         Int        @id @default(autoincrement())
+  sender     String     @map("sender")
+  message    String     @map("message")
+  song       String     @map("song")
+  recipient  String     @map("recipient")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime?  @map("updated_at")
   
   @@map("menfess")
 }
