@@ -54,5 +54,5 @@ jika sudah bisa selanjutnya kalian bisa melakukan perubahan pada kode lalu mengi
 Mereka yang dibawah ini telah menjadi kontributor di repositori ini. Ayo selanjutnya giliran kamu.
 
 <a href="https://github.com/Polines-Drag-Funk/PolinesMenfess-API/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Polines-Drag-Funk/PolinesMenfess-API" />
+  <img src="https://contrib.rocks/image?repo=Polines-Drag-Funk/PolinesMenfess-API"/>
 </a>
