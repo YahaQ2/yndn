@@ -9,7 +9,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: process.env.API_BASE_URL || 'http://localhost:3000',
+      url: 'http://localhost:3000',
     },
   ],
   components: {
