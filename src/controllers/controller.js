@@ -1,6 +1,5 @@
-const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient()
-const { response } = require('../services/response')
+const supabase = require('../database');
+const { response } = require('../services/response');
 
 class Controller {
     /**
@@ -35,35 +34,31 @@ class Controller {
     static async getMenfess(req, res) {
         try {
             const { sender, recipient } = req.query;
-
-            const filters = {};
+            let query = supabase.from('menfess').select('*');
+            
+            // Hanya tambahkan filter jika ada nilai untuk 'sender' atau 'recipient'
             if (sender) {
-                filters.sender = {
-                    contains: sender.toLowerCase(),
-                };
+                query = query.ilike('sender', `%${sender.toLowerCase()}%`);
             }
             if (recipient) {
-                filters.recipient = {
-                    contains: recipient.toLowerCase(),
-                };
+                query = query.ilike('recipient', `%${recipient.toLowerCase()}%`);
             }
     
-            const menfesses = await prisma.menfess.findMany({
-                where: filters,
-            });
+            // Jalankan query
+            const { data: menfesses, error } = await query;
     
-            if (menfesses.length === 0) {
+            if (error) {
+                console.error(error);
+                return res.status(500).json(response(false, false, "Internal Server Error", null));
+            }
+    
+            if (!menfesses || menfesses.length === 0) {
                 return res.status(404).json(response(false, false, "Menfess tidak ditemukan", null));
             }
     
             return res.status(200).json(response(true, true, null, menfesses));
         } catch (error) {
             console.error(error);
-
-            if (error instanceof PrismaClientValidationError) {
-                return res.status(400).json(response(false, false, "Error dalam validasi Prisma", null));
-            }
-            
             return res.status(500).json(response(false, false, "Internal Server Error", null));
         }
     }
@@ -95,28 +90,29 @@ class Controller {
      */
     static async createMenfess(req, res) {
         try {
-            const { sender, message, song, recipient } = req.body
+            const { sender, message, song, recipient } = req.body;
 
             if (!sender || !message || !recipient) {
-                return res.status(400).json(response(false, false, "Sender, message, recipient is required", null))
+                return res.status(400).json(response(false, false, "Sender, message, recipient is required", null));
             }
 
-            const newMenfess = await prisma.menfess.create({
-                data: {
-                    sender, 
-                    message, 
-                    song: song || '', 
-                    recipient
-                }
-            })
+            const { data: newMenfess, error } = await supabase
+                .from('menfess')
+                .insert([
+                    { sender, message, song: song || '', recipient }
+                ]);
 
-            return res.status(201).json(response(true, true, "Success create menfess", newMenfess))
+            if (error) {
+                console.error(error);
+                return res.status(500).json(response(false, false, "Internal Server Error", null));
+            }
+
+            return res.status(201).json(response(true, true, "Success create menfess", newMenfess));
         } catch (error) {
-            console.error(error)
-            return res.status(500).json(response(false, false, "Internal Server Error", null))
+            console.error(error);
+            return res.status(500).json(response(false, false, "Internal Server Error", null));
         }
     }
-
 
     /**
      * @swagger
@@ -145,16 +141,27 @@ class Controller {
      */
     static async getMenfessById(req, res) {
         try {
-            const id = req.params.id
+            const id = req.params.id;
 
-            const menfessById = await prisma.menfess.findUnique({
-                where: { id: parseInt(id) },
-            })
+            const { data: menfessById, error } = await supabase
+                .from('menfess')
+                .select('*')
+                .eq('id', id)
+                .single();
 
-            return res.status(200).json(response(true, true, "Success update menfess", menfessById))
+            if (error) {
+                console.error(error);
+                return res.status(500).json(response(false, false, "Internal Server Error", null));
+            }
+
+            if (!menfessById) {
+                return res.status(404).json(response(false, false, "Menfess tidak ditemukan", null));
+            }
+
+            return res.status(200).json(response(true, true, "Success get menfess", menfessById));
         } catch (error) {
-            console.error(error)
-            return res.status(500).json(response(false, false, "Internal Server Error", null))
+            console.error(error);
+            return res.status(500).json(response(false, false, "Internal Server Error", null));
         }
     }
 
@@ -191,28 +198,27 @@ class Controller {
      */
     static async editMenfess(req, res) {
         try {
-            const id = req.params.id
-            const { sender, message, song, recipient } = req.body
+            const id = req.params.id;
+            const { sender, message, song, recipient } = req.body;
 
-            const updateMenfess = await prisma.menfess.update({
-                where: { id: parseInt(id) }, 
-                data: {
-                    sender, 
-                    message, 
-                    song, 
-                    recipient, 
-                    updatedAt: new Date()
-                }
-            })
+            const { data: updateMenfess, error } = await supabase
+                .from('menfess')
+                .update({ sender, message, song, recipient, updatedAt: new Date() })
+                .eq('id', id);
 
-            return res.status(200).json(response(true, true, "Success update menfess", updateMenfess))
+            if (error) {
+                console.error(error);
+                return res.status(500).json(response(false, false, "Internal Server Error", null));
+            }
+
+            return res.status(200).json(response(true, true, "Success update menfess", updateMenfess));
         } catch (error) {
-            console.error(error)
-            return res.status(500).json(response(false, false, "Internal Server Error", null))
+            console.error(error);
+            return res.status(500).json(response(false, false, "Internal Server Error", null));
         }
     }
 
-    /**
+       /**
      * @swagger
      * /v1/api/menfess/{id}:
      *   delete:
@@ -233,18 +239,28 @@ class Controller {
      *       500:
      *         description: Terjadi kesalahan pada server
      */
-    static async deleteMenfess(req, res) {
+       static async deleteMenfess(req, res) {
         try {
-            const id = req.params.id
+            const id = req.params.id;
 
-            await prisma.menfess.delete({
-                where: { id: parseInt(id) }
-            })
+            const { data, error } = await supabase
+                .from('menfess')
+                .delete()
+                .eq('id', id);
 
-            return res.status(200).json(response(true, true, "Success delete menfess", null))
+            if (error) {
+                console.error(error);
+                return res.status(500).json(response(false, false, "Internal Server Error", null));
+            }
+
+            if (data.length === 0) {
+                return res.status(404).json(response(false, false, "Menfess tidak ditemukan", null));
+            }
+
+            return res.status(200).json(response(true, true, "Success delete menfess", null));
         } catch (error) {
-            console.error(error)
-            return res.status(500).json(response(false, false, "Internal Server Error", null))
+            console.error(error);
+            return res.status(500).json(response(false, false, "Internal Server Error", null));
         }
     }
 }
