@@ -9,14 +9,10 @@ const swaggerDefinition = {
   },
   servers: [
     {
-        servers: [
-            {
-              url: process.env.NODE_ENV === 'production' 
-                ? 'https://solifess.vercel.app' 
-                : 'http://localhost:3000',
-            },
-          ],
-          
+      // Menggunakan ternary operator untuk memilih URL berdasarkan environment
+      url: process.env.NODE_ENV === 'production' 
+        ? 'https://solifess.vercel.app' 
+        : 'http://localhost:3000',
     },
   ],
   components: {

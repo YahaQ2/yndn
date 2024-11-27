@@ -7,6 +7,7 @@ const route = require('./routes/route');
 const app = express();
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./docs/swagger');
+const path = require('path');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -24,7 +25,7 @@ app.get('/swagger.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(swaggerSpec);
 });
-
+app.use(express.static(path.join(__dirname, '../public')));
 
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
