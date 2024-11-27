@@ -9,7 +9,14 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3000',
+        servers: [
+            {
+              url: process.env.NODE_ENV === 'production' 
+                ? 'https://solifess.vercel.app' 
+                : 'http://localhost:3000',
+            },
+          ],
+          
     },
   ],
   components: {
