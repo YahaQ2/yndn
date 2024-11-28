@@ -20,11 +20,11 @@ class Controller {
      *           type: string
      *         description: Nama penerima yang ingin dicari
      *       - in: query
-     *         name: year
+     *         name: date
      *         schema:
      *           type: string
-     *           example: "2024"
-     *         description: Tahun menfess yang ingin dicari (format: YYYY)
+     *           example: "2024-11-28"
+     *         description: Tanggal menfess yang ingin dicari (format: YYYY-MM-DD)
      *     responses:
      *       200:
      *         description: Daftar menfess berhasil diambil
@@ -41,7 +41,7 @@ class Controller {
      */
     static async getMenfess(req, res) {
         try {
-            const { sender, recipient, year } = req.query;
+            const { sender, recipient, date } = req.query;
             let query = supabase.from('menfess').select('*');
             
             // Hanya tambahkan filter jika ada nilai untuk 'sender' atau 'recipient'
@@ -52,10 +52,11 @@ class Controller {
                 query = query.ilike('recipient', `%${recipient.toLowerCase()}%`);
             }
     
-            // Filter berdasarkan tahun jika ada nilai parameter 'year'
-            if (year) {
-                query = query.gte('created_at', `${year}-01-01`).lte('created_at', `${year}-12-31`);
-            }
+            // Filter berdasarkan tanggal jika ada nilai parameter 'date'
+            if (date) {
+                const formattedDate = date + ' 00:00:00'; // Menambahkan waktu default 00:00:00
+                query = query.gte('created_at', formattedDate).lte('created_at', `${date} 23:59:59`); // Memastikan filter mencakup seluruh hari
+            }    
     
             // Urutan berdasarkan 'created_at' secara ascending
             query = query.order('created_at', { ascending: true });
