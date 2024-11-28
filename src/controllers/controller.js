@@ -19,6 +19,12 @@ class Controller {
      *         schema:
      *           type: string
      *         description: Nama penerima yang ingin dicari
+     *       - in: query
+     *         name: year
+     *         schema:
+     *           type: string
+     *           example: "2024"
+     *         description: Tahun menfess yang ingin dicari (format: YYYY)
      *     responses:
      *       200:
      *         description: Daftar menfess berhasil diambil
@@ -28,12 +34,14 @@ class Controller {
      *               type: array
      *               items:
      *                 $ref: '#/components/schemas/Menfess'
+     *       404:
+     *         description: Tidak ada menfess ditemukan dengan kriteria yang diberikan
      *       500:
      *         description: Terjadi kesalahan pada server
      */
     static async getMenfess(req, res) {
         try {
-            const { sender, recipient } = req.query;
+            const { sender, recipient, year } = req.query;
             let query = supabase.from('menfess').select('*');
             
             // Hanya tambahkan filter jika ada nilai untuk 'sender' atau 'recipient'
@@ -43,6 +51,14 @@ class Controller {
             if (recipient) {
                 query = query.ilike('recipient', `%${recipient.toLowerCase()}%`);
             }
+    
+            // Filter berdasarkan tahun jika ada nilai parameter 'year'
+            if (year) {
+                query = query.gte('created_at', `${year}-01-01`).lte('created_at', `${year}-12-31`);
+            }
+    
+            // Urutan berdasarkan 'created_at' secara ascending
+            query = query.order('created_at', { ascending: true });
     
             // Jalankan query
             const { data: menfesses, error } = await query;
@@ -62,7 +78,6 @@ class Controller {
             return res.status(500).json(response(false, false, "Internal Server Error", null));
         }
     }
-    
 
     /**
      * @swagger
@@ -218,7 +233,7 @@ class Controller {
         }
     }
 
-       /**
+    /**
      * @swagger
      * /v1/api/menfess/{id}:
      *   delete:
@@ -239,7 +254,7 @@ class Controller {
      *       500:
      *         description: Terjadi kesalahan pada server
      */
-       static async deleteMenfess(req, res) {
+    static async deleteMenfess(req, res) {
         try {
             const id = req.params.id;
 
