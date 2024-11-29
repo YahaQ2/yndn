@@ -1,6 +1,7 @@
 const axios = require('axios');
 
 class SpotifyService {
+
   static async getAccessToken() {
     const clientId = process.env.SPOTIFY_CLIENT_ID;
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
@@ -29,23 +30,33 @@ class SpotifyService {
 
   static async searchSong(query) {
     try {
+      const clientId = process.env.SPOTIFY_CLIENT_ID;
+      const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  
+      if (!clientId || !clientSecret) {
+        throw new Error('Spotify credentials are missing');
+      }
+  
       const accessToken = await this.getAccessToken();
-
+  
       const response = await axios.get('https://api.spotify.com/v1/search', {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { 
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
         params: {
           q: query,
           type: 'track',
           limit: 1,
         },
       });
-
-      const tracks = response.data.tracks.items;
-
-      if (tracks.length === 0) {
+  
+      const tracks = response.data.tracks?.items;
+  
+      if (!tracks || tracks.length === 0) {
         return null;
       }
-
+  
       const track = tracks[0];
       return {
         id: track.id,
@@ -55,8 +66,13 @@ class SpotifyService {
         preview_url: track.preview_url,
       };
     } catch (error) {
-      console.error('Error searching song in Spotify:', error.message);
-      throw new Error('Failed to fetch song from Spotify.');
+      console.error('Detailed Spotify search error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        stack: error.stack
+      });
+      throw error;
     }
   }
 }
