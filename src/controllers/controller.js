@@ -3,65 +3,63 @@ const { response } = require('../services/response');
 
 class Controller {
     /**
-     * @swagger
-     * /v1/api/menfess:
-     *   get:
-     *     summary: Mendapatkan daftar menfess dengan filter berdasarkan query parameters
-     *     tags: [Menfess]
-     *     parameters:
-     *       - in: query
-     *         name: sender
-     *         schema:
-     *           type: string
-     *         description: Nama pengirim yang ingin dicari
-     *       - in: query
-     *         name: recipient
-     *         schema:
-     *           type: string
-     *         description: Nama penerima yang ingin dicari
-     *       - in: query
-     *         name: date
-     *         schema:
-     *           type: string
-     *           example: "2024-11-28"
-     *         description: Tanggal menfess yang ingin dicari (format: YYYY-MM-DD)
-     *     responses:
-     *       200:
-     *         description: Daftar menfess berhasil diambil
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: array
-     *               items:
-     *                 $ref: '#/components/schemas/Menfess'
-     *       404:
-     *         description: Tidak ada menfess ditemukan dengan kriteria yang diberikan
-     *       500:
-     *         description: Terjadi kesalahan pada server
-     */
+ * @swagger
+ * /v1/api/menfess:
+ *   get:
+ *     summary: Retrieve menfess messages
+ *     tags:
+ *       - Menfess
+ *     parameters:
+ *       - in: query
+ *         name: sender
+ *         schema:
+ *           type: string
+ *         description: Filter by sender name
+ *       - in: query
+ *         name: recipient
+ *         schema:
+ *           type: string
+ *         description: Filter by recipient name
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: >
+ *           Filter by date (format: YYYY-MM-DD)
+ *     responses:
+ *       200:
+ *         description: Successful retrieval of menfess messages
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Menfess'
+ *       404:
+ *         description: No menfess messages found
+ *       500:
+ *         description: Internal server error
+ */
     static async getMenfess(req, res) {
         try {
             const { sender, recipient, date } = req.query;
             let query = supabase.from('menfess').select('*');
-            
-            // Hanya tambahkan filter jika ada nilai untuk 'sender' atau 'recipient'
+
             if (sender) {
                 query = query.ilike('sender', `%${sender.toLowerCase()}%`);
             }
             if (recipient) {
                 query = query.ilike('recipient', `%${recipient.toLowerCase()}%`);
             }
-    
-            // Filter berdasarkan tanggal jika ada nilai parameter 'date'
+
             if (date) {
-                const formattedDate = date + ' 00:00:00'; // Menambahkan waktu default 00:00:00
-                query = query.gte('created_at', formattedDate).lte('created_at', `${date} 23:59:59`); // Memastikan filter mencakup seluruh hari
+                const formattedDate = date + ' 00:00:00';
+                query = query.gte('created_at', formattedDate).lte('created_at', `${date} 23:59:59`);
             }    
-    
-            // Urutan berdasarkan 'created_at' secara ascending
-            query = query.order('created_at', { ascending: true });
-    
-            // Jalankan query
+
+            query = query.order('created_at', { ascending: false });
+
             const { data: menfesses, error } = await query;
     
             if (error) {
