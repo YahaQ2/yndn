@@ -12,5 +12,6 @@ router.get('/menfess/:id', MenfessController.getMenfessById)
 
 // Route Menfess v2
 router.post('/menfess-spotify', MenfessSpotifyController.createMenfessWithSpotify)
+router.get('/search-spotify-song', MenfessSpotifyController.searchSpotifySong)
 
 module.exports = router

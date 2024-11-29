@@ -143,6 +143,40 @@ class MenfessController {
       });
     }
   }
+
+  static async searchSpotifySong(req, res) {
+    try {
+      const { song } = req.query;
+  
+      if (!song) {
+        return res.status(400).json({
+          success: false,
+          message: 'Song query is required',
+        });
+      }
+  
+      const track = await SpotifyService.searchSong(song);
+  
+      if (!track) {
+        return res.status(404).json({
+          success: false,
+          message: 'Song not found',
+        });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        data: track,
+      });
+    } catch (error) {
+      console.error('Error searching song:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to search song',
+      });
+    }
+  }
 }
+
 
 module.exports = MenfessController;
