@@ -26,9 +26,9 @@ class SpotifyService {
         }
       );
 
-      const expiresIn = response.data.expires_in * 1000; // API expiry time in ms
+      const expiresIn = response.data.expires_in * 1000;
       this.accessToken = response.data.access_token;
-      this.tokenExpiryTime = Date.now() + expiresIn - 60000; // Refresh 1 minute early
+      this.tokenExpiryTime = Date.now() + expiresIn - 60000;
 
       return this.accessToken;
     } catch (error) {
@@ -45,7 +45,7 @@ class SpotifyService {
         if (error.response && error.response.status === 429 && attempt < retries - 1) {
           const retryAfter = error.response.headers['retry-after']
             ? parseInt(error.response.headers['retry-after'], 10) * 1000
-            : 1000; // Default retry wait time is 1 second if not specified
+            : 1000;
           console.warn(`Rate limited. Retrying after ${retryAfter} ms...`);
           await new Promise(resolve => setTimeout(resolve, retryAfter));
         } else {
@@ -85,7 +85,6 @@ class SpotifyService {
   }
 
   static async getTrackDetails(menfessSpotifyId) {
-    // Check if data exists in cache
     if (this.trackCache.has(menfessSpotifyId)) {
       return this.trackCache.get(menfessSpotifyId);
     }
@@ -111,7 +110,6 @@ class SpotifyService {
         external_url: track.external_urls.spotify || null,
       };
 
-      // Save to cache
       this.trackCache.set(menfessSpotifyId, trackDetails);
 
       return trackDetails;
