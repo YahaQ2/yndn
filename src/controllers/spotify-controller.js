@@ -1,4 +1,4 @@
-const { SpotifyService, SpotifyTrackService } = require('../services/spotify-service');
+const SpotifyService = require('../services/spotify-service');
 const supabase = require('../database');
 const { response } = require('../services/response');
 
@@ -55,35 +55,34 @@ class MenfessController {
   static async searchSpotifySong(req, res) {
     try {
       const { song } = req.query;
-  
-      if (!song) {
+      if (!song || song.trim() === '') {
         return res.status(400).json({
           success: false,
           message: 'Song query is required',
         });
       }
-  
-      const track = await SpotifyService.searchSong(song);
-  
-      if (!track) {
+      const tracks = await SpotifyService.searchSong(song);
+      if (!tracks || tracks.length === 0) {
         return res.status(404).json({
           success: false,
-          message: 'Song not found',
+          message: 'No songs found',
         });
       }
-  
+
       return res.status(200).json({
         success: true,
-        data: track,
+        data: tracks,
       });
     } catch (error) {
-      console.error('Error searching song:', error);
+      console.error('Error searching song:', error.message);
+  
       return res.status(500).json({
         success: false,
-        message: 'Failed to search song',
+        message: 'Failed to search song. Please try again later.',
       });
     }
   }
+  
 
   static async getMenfessSpotify(req, res) {
     try {

@@ -49,15 +49,13 @@ class SpotifyService {
         },
       });
 
-      const tracks = response.data.tracks.items.map(track => ({
+      return response.data.tracks.items.map(track => ({
         id: track.id,
         name: track.name,
         artist: track.artists.map(artist => artist.name).join(', '),
         album: track.album.name,
         cover_url: track.album.images[0]?.url || '',
       }));
-
-      return tracks;
     } catch (error) {
       console.error('Error searching song in Spotify:', error.message);
       throw new Error('Failed to fetch song from Spotify.');
