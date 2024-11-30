@@ -3,7 +3,6 @@ const axios = require('axios');
 class SpotifyService {
   static accessToken = null;
   static tokenExpiryTime = null;
-  static trackCache = new Map();
 
   static async getAccessToken() {
     if (this.accessToken && this.tokenExpiryTime > Date.now()) {
@@ -37,39 +36,18 @@ class SpotifyService {
     }
   }
 
-  static async fetchWithRetry(url, options, retries = 3) {
-    for (let attempt = 0; attempt < retries; attempt++) {
-      try {
-        return await axios.get(url, options);
-      } catch (error) {
-        if (error.response && error.response.status === 429 && attempt < retries - 1) {
-          const retryAfter = error.response.headers['retry-after']
-            ? parseInt(error.response.headers['retry-after'], 10) * 1000
-            : 1000;
-          console.warn(`Rate limited. Retrying after ${retryAfter} ms...`);
-          await new Promise(resolve => setTimeout(resolve, retryAfter));
-        } else {
-          throw error;
-        }
-      }
-    }
-  }
-
   static async searchSong(query) {
     try {
       const accessToken = await this.getAccessToken();
 
-      const response = await this.fetchWithRetry(
-        'https://api.spotify.com/v1/search',
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-          params: {
-            q: query,
-            type: 'track',
-            limit: 5,
-          },
-        }
-      );
+      const response = await axios.get('https://api.spotify.com/v1/search', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: {
+          q: query,
+          type: 'track',
+          limit: 5,
+        },
+      });
 
       return response.data.tracks.items.map(track => ({
         id: track.id,
@@ -85,22 +63,15 @@ class SpotifyService {
   }
 
   static async getTrackDetails(menfessSpotifyId) {
-    if (this.trackCache.has(menfessSpotifyId)) {
-      return this.trackCache.get(menfessSpotifyId);
-    }
-
     try {
       const accessToken = await this.getAccessToken();
 
-      const response = await this.fetchWithRetry(
-        `https://api.spotify.com/v1/tracks/${menfessSpotifyId}`,
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        }
-      );
+      const response = await axios.get(`https://api.spotify.com/v1/tracks/${menfessSpotifyId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
 
       const track = response.data;
-      const trackDetails = {
+      return {
         id: track.id,
         name: track.name,
         artist: track.artists.map(artist => artist.name).join(', '),
@@ -109,13 +80,9 @@ class SpotifyService {
         preview_url: track.preview_url || null,
         external_url: track.external_urls.spotify || null,
       };
-
-      this.trackCache.set(menfessSpotifyId, trackDetails);
-
-      return trackDetails;
     } catch (error) {
-      console.error('Error fetching track details from Spotify:', error.message);
-      throw new Error('Failed to fetch track details from Spotify.');
+      console.error('Error fetching track details:', error.message);
+      return null;
     }
   }
 }
