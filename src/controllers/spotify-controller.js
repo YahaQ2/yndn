@@ -87,7 +87,7 @@ class MenfessController {
 
   static async getMenfessSpotify(req, res) {
     try {
-        const { id, sender, recipient, date } = req.query;
+        const { id, sender, recipient, date, sort } = req.query;
 
         let query;
 
@@ -107,7 +107,8 @@ class MenfessController {
                 query = query.gte('created_at', formattedDate).lte('created_at', `${date} 23:59:59`);
             }
 
-            query = query.order('created_at', { ascending: false });
+            const isAscending = sort === 'asc';
+            query = query.order('created_at', { ascending: isAscending });
         }
 
         const { data: menfesses, error } = await query;
