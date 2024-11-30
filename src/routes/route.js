@@ -14,7 +14,7 @@ router.get('/menfess/:id', Controller.getMenfessById)
 router.post('/menfess-spotify', MenfessController.createMenfessWithSpotify)
 router.get('/menfess-spotify-search', 
     MenfessController.searchSongLimiter, 
-    MenfessController.searchSpotifySong
+    MenfessController.getMenfessSpotify
   );
 router.get('/menfess-spotify-search/:id', MenfessController.getMenfessSpotifyById)
 router.get('/search-spotify-song', MenfessController.searchSpotifySong)
