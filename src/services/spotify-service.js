@@ -30,51 +30,86 @@ class SpotifyService {
 
   static async searchSong(query) {
     try {
-      const clientId = process.env.SPOTIFY_CLIENT_ID;
-      const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-  
-      if (!clientId || !clientSecret) {
-        throw new Error('Spotify credentials are missing');
-      }
-  
       const accessToken = await this.getAccessToken();
   
       const response = await axios.get('https://api.spotify.com/v1/search', {
-        headers: { 
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
         params: {
           q: query,
           type: 'track',
-          limit: 1,
+          limit: 5,
         },
       });
   
-      const tracks = response.data.tracks?.items;
-  
-      if (!tracks || tracks.length === 0) {
-        return null;
-      }
-  
-      const track = tracks[0];
-      return {
+      const tracks = response.data.tracks.items.map(track => ({
         id: track.id,
         name: track.name,
         artist: track.artists.map((artist) => artist.name).join(', '),
         album: track.album.name,
-        preview_url: track.preview_url,
-      };
+        cover_url: track.album.images[0]?.url || '',
+      }));
+  
+      return tracks;
     } catch (error) {
-      console.error('Detailed Spotify search error:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        stack: error.stack
-      });
-      throw error;
+      console.error('Error searching song in Spotify:', error.message);
+      throw new Error('Failed to fetch song from Spotify.');
     }
   }
 }
 
-module.exports = SpotifyService;
+
+class SpotifyTrackService {
+    static async getAccessToken() {
+      const clientId = process.env.SPOTIFY_CLIENT_ID;
+      const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  
+      const token = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  
+      try {
+        const response = await axios.post(
+          'https://accounts.spotify.com/api/token',
+          'grant_type=client_credentials',
+          {
+            headers: {
+              Authorization: `Basic ${token}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          }
+        );
+  
+        return response.data.access_token;
+      } catch (error) {
+        console.error('Error getting Spotify access token:', error.message);
+        throw new Error('Failed to authenticate with Spotify');
+      }
+    }
+  
+    static async getTrackDetails(menfessSpotifyId) {
+      try {
+        const accessToken = await this.getAccessToken();
+  
+        const response = await axios.get(`https://api.spotify.com/v1/tracks/${menfessSpotifyId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+  
+        const track = response.data;
+        return {
+          id: track.id,
+          name: track.name,
+          artist: track.artists.map(artist => artist.name).join(', '),
+          album: track.album.name,
+          cover_url: track.album.images[0]?.url || '',
+          preview_url: track.preview_url || null,
+          external_url: track.external_urls.spotify || null
+        };
+      } catch (error) {
+        console.error('Error fetching track details:', error.message);
+        return null;
+      }
+    }
+  }
+
+  module.exports = {
+    SpotifyService,
+    SpotifyTrackService
+  };
