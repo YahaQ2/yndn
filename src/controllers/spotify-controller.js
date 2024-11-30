@@ -126,7 +126,7 @@ class MenfessController {
 
             if (menfess.spotify_id) {
                 try {
-                    trackDetails = await SpotifyTrackService.getTrackDetails(menfess.spotify_id);
+                    trackDetails = await SpotifyService.getTrackDetails(menfess.spotify_id);
                 } catch (error) {
                     console.error('Error fetching track details from Spotify:', error.message);
                 }
@@ -177,7 +177,7 @@ static async getMenfessSpotifyById(req, res) {
 
             if (menfess.spotify_id) {
                 try {
-                    trackDetails = await SpotifyTrackService.getTrackDetails(menfess.spotify_id);
+                    trackDetails = await SpotifyService.getTrackDetails(menfess.spotify_id);
                 } catch (error) {
                     console.error('Error fetching track details from Spotify:', error.message);
                 }
