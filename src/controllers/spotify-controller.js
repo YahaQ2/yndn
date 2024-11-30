@@ -1,22 +1,8 @@
 const { SpotifyService, SpotifyTrackService } = require('../services/spotify-service');
 const supabase = require('../database');
 const { response } = require('../services/response');
-const rateLimit = require('express-rate-limit');
-
-// Konfigurasi rate limiter untuk search song
-const searchSongLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 menit
-  max: 100, // Maksimal 100 request per window
-  message: {
-    success: false,
-    message: 'Too many search requests, please try again later.'
-  }
-});
 
 class MenfessController {
-  // Middleware rate limiter untuk route tertentu
-  static searchSongLimiter = searchSongLimiter;
-
   static async createMenfessWithSpotify(req, res) {
     try {
       const { sender, message, spotify_id, recipient } = req.body;
@@ -77,30 +63,19 @@ class MenfessController {
         });
       }
   
-      try {
-        const tracks = await SpotifyService.searchSong(song);
-    
-        if (!tracks || tracks.length === 0) {
-          return res.status(404).json({
-            success: false,
-            message: 'Song not found',
-          });
-        }
-    
-        return res.status(200).json({
-          success: true,
-          data: tracks,
+      const track = await SpotifyService.searchSong(song);
+  
+      if (!track) {
+        return res.status(404).json({
+          success: false,
+          message: 'Song not found',
         });
-      } catch (error) {
-        if (error.message.includes('429')) {
-          return res.status(429).json({
-            success: false,
-            message: 'Too many requests to Spotify. Please try again later.',
-          });
-        }
-        
-        throw error; // Re-throw other errors
       }
+  
+      return res.status(200).json({
+        success: true,
+        data: track,
+      });
     } catch (error) {
       console.error('Error searching song:', error);
       return res.status(500).json({
