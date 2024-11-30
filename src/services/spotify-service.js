@@ -8,6 +8,10 @@ class SpotifyService {
 
     const token = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
+    console.log('Attempting to get Spotify access token');
+    console.log('Client ID:', clientId.substring(0, 5) + '...');
+    console.log('Client Secret:', clientSecret.substring(0, 5) + '...');
+
     try {
       const response = await axios.post(
         'https://accounts.spotify.com/api/token',
@@ -22,9 +26,13 @@ class SpotifyService {
 
       return response.data.access_token;
     } catch (error) {
-      console.error('Error getting Spotify access token:', error.message);
-      throw new Error('Failed to authenticate with Spotify');
-    }
+        console.error('Error getting Spotify access token:', error.message);
+        if (error.response) {
+          console.error('Response data:', error.response.data);
+          console.error('Response status:', error.response.status);
+        }
+        throw new Error('Failed to authenticate with Spotify');
+      }
   }
 
 
