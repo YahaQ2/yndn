@@ -9,118 +9,130 @@ const menfessCache = new NodeCache({
 });
 
 class MenfessController {
-    static async createMenfessWithSpotify(req, res) {
+
+    static async searchSpotifySong(req, res) {
         try {
-          const { sender, message, spotify_id, recipient } = req.body;
-      
-          if (!sender || !message || !recipient || !spotify_id) {
+          const { song } = req.query;
+          if (!song || song.trim() === '') {
             return res.status(400).json({
               success: false,
-              message: 'Sender, message, recipient, dan Spotify ID wajib diisi',
+              message: 'Song query is required',
             });
           }
-      
-          const { data: existingSpotify, error: spotifyCheckError } = await supabase
-            .from('spotify')
-            .select('*')
-            .eq('spotify_id', spotify_id)
-            .single();
-
-          if (spotifyCheckError || !existingSpotify) {
-            const trackDetails = await SpotifyService.getTrackDetails(spotify_id);
-      
-            if (trackDetails) {
-              const { data: newSpotifyTrack, error: spotifyInsertError } = await supabase
-                .from('spotify')
-                .insert({
-                  spotify_id: trackDetails.id,
-                  name: trackDetails.name,
-                  artist: trackDetails.artist,
-                  cover_url: trackDetails.cover_url,
-                  external_url: trackDetails.external_url
-                })
-                .select()
-                .single();
-      
-              if (spotifyInsertError) {
-                console.error('Gagal menambahkan metadata Spotify:', spotifyInsertError);
-                return res.status(500).json({
-                  success: false,
-                  message: 'Gagal menyimpan metadata Spotify',
-                });
-              }
-      
-              existingSpotify = newSpotifyTrack;
-            }
-          }
-      
-          const { data: newMenfess, error: menfessError } = await supabase
-            .from('menfess')
-            .insert({
-              sender,
-              message,
-              spotify_id: spotify_id,
-              recipient,
-            })
-            .select()
-            .single();
-
-          if (menfessError) {
-            console.error('Gagal membuat menfess:', menfessError);
-            return res.status(500).json({
+          const tracks = await SpotifyService.searchSong(song);
+          if (!tracks || tracks.length === 0) {
+            return res.status(404).json({
               success: false,
-              message: 'Gagal membuat menfess',
+              message: 'No songs found',
             });
           }
-      
-          return res.status(201).json({
+    
+          return res.status(200).json({
             success: true,
-            message: 'Berhasil membuat menfess',
-            data: {
-              ...newMenfess,
-              spotify: existingSpotify || null
-            },
+            data: tracks,
           });
-      
         } catch (error) {
-          console.error('Error membuat menfess:', error.message);
+          console.error('Error searching song:', error.message);
+      
           return res.status(500).json({
             success: false,
-            message: 'Kesalahan Internal Server',
+            message: 'Failed to search song. Please try again later.',
           });
         }
       }
-  
-  static async searchSpotifySong(req, res) {
-    try {
-      const { song } = req.query;
-      if (!song || song.trim() === '') {
-        return res.status(400).json({
-          success: false,
-          message: 'Song query is required',
-        });
-      }
-      const tracks = await SpotifyService.searchSong(song);
-      if (!tracks || tracks.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: 'No songs found',
-        });
-      }
 
-      return res.status(200).json({
-        success: true,
-        data: tracks,
-      });
-    } catch (error) {
-      console.error('Error searching song:', error.message);
-  
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to search song. Please try again later.',
-      });
+      static async createMenfessWithSpotify(req, res) {
+        try {
+            const { 
+                sender, 
+                message, 
+                spotify_id, 
+                recipient, 
+                track_metadata 
+            } = req.body;
+
+            if (!sender || !message || !recipient || !spotify_id) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Sender, message, recipient, dan Spotify ID wajib diisi',
+                });
+            }
+
+            let spotifyTrack = await supabase
+                .from('spotify')
+                .select('*')
+                .eq('spotify_id', spotify_id)
+                .single();
+
+            if (spotifyTrack.error || !spotifyTrack.data) {
+
+                const trackDetails = track_metadata || await SpotifyService.getTrackDetails(spotify_id);
+    
+                if (!trackDetails) {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Detail lagu tidak ditemukan',
+                    });
+                }
+
+                const { data: newSpotifyTrack, error: spotifyInsertError } = await supabase
+                    .from('spotify')
+                    .insert({
+                        spotify_id: trackDetails.id || spotify_id,
+                        name: trackDetails.name,
+                        artist: trackDetails.artist,
+                        cover_url: trackDetails.cover_url,
+                        external_url: trackDetails.external_url
+                    })
+                    .select()
+                    .single();
+    
+                if (spotifyInsertError) {
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Gagal menyimpan metadata Spotify',
+                    });
+                }
+
+                spotifyTrack = { data: newSpotifyTrack };
+            }
+
+            const { data: newMenfess, error: menfessError } = await supabase
+                .from('menfess')
+                .insert({
+                    sender,
+                    message,
+                    spotify_id: spotify_id,
+                    recipient
+                })
+                .select()
+                .single();
+    
+            if (menfessError) {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Gagal membuat menfess',
+                });
+            }
+    
+            return res.status(201).json({
+                success: true,
+                message: 'Berhasil membuat menfess',
+                data: {
+                    menfess: newMenfess,
+                    spotify: spotifyTrack.data
+                },
+            });
+    
+        } catch (error) {
+            console.error('Error membuat menfess:', error.message);
+            return res.status(500).json({
+                success: false,
+                message: 'Kesalahan Internal Server',
+                error: error.message
+            });
+        }
     }
-  }
   
   static async getMenfessSpotify(req, res) {
     try {
