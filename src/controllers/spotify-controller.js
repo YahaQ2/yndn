@@ -9,28 +9,59 @@ const menfessCache = new NodeCache({
 });
 
 class MenfessController {
+    static async searchSpotifySong(req, res) {
+        try {
+          const { song } = req.query;
+          if (!song || song.trim() === '') {
+            return res.status(400).json({
+              success: false,
+              message: 'Song query is required',
+            });
+          }
+          const tracks = await SpotifyService.searchSong(song);
+          if (!tracks || tracks.length === 0) {
+            return res.status(404).json({
+              success: false,
+              message: 'No songs found',
+            });
+          }
+    
+          return res.status(200).json({
+            success: true,
+            data: tracks,
+          });
+        } catch (error) {
+          console.error('Error searching song:', error.message);
+      
+          return res.status(500).json({
+            success: false,
+            message: 'Failed to search song. Please try again later.',
+          });
+        }
+      }
+      
     static async createMenfessWithSpotify(req, res) {
         try {
           const { sender, message, spotify_id, recipient } = req.body;
-    
+      
           if (!sender || !message || !recipient || !spotify_id) {
             return res.status(400).json({
               success: false,
               message: 'Sender, message, recipient, dan Spotify ID wajib diisi',
             });
           }
-    
+      
           const { data: existingSpotify, error: spotifyCheckError } = await supabase
             .from('spotify')
             .select('spotify_id')
             .eq('spotify_id', spotify_id)
             .single();
-
+      
           if (spotifyCheckError || !existingSpotify) {
             const trackDetails = await SpotifyService.getTrackDetails(spotify_id);
-    
+      
             if (trackDetails) {
-              const { error: spotifyInsertError } = await supabase
+              const { data: newSpotifyTrack, error: spotifyInsertError } = await supabase
                 .from('spotify')
                 .insert({
                   spotify_id: trackDetails.id,
@@ -38,8 +69,9 @@ class MenfessController {
                   artist: trackDetails.artist,
                   cover_url: trackDetails.cover_url,
                   external_url: trackDetails.external_url
-                });
-    
+                })
+                .select();
+      
               if (spotifyInsertError) {
                 console.error('Gagal menambahkan metadata Spotify:', spotifyInsertError);
                 return res.status(500).json({
@@ -49,7 +81,7 @@ class MenfessController {
               }
             }
           }
-    
+      
           const { data: newMenfess, error: menfessError } = await supabase
             .from('menfess')
             .insert({
@@ -59,7 +91,7 @@ class MenfessController {
               recipient,
             })
             .select();
-    
+
           if (menfessError) {
             console.error('Gagal membuat menfess:', menfessError);
             return res.status(500).json({
@@ -67,13 +99,13 @@ class MenfessController {
               message: 'Gagal membuat menfess',
             });
           }
-    
+      
           return res.status(201).json({
             success: true,
             message: 'Berhasil membuat menfess',
             data: newMenfess[0],
           });
-    
+      
         } catch (error) {
           console.error('Error membuat menfess:', error.message);
           return res.status(500).json({
