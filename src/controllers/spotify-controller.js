@@ -4,42 +4,11 @@ const { response } = require('../services/response');
 const NodeCache = require('node-cache');
 
 const menfessCache = new NodeCache({ 
-    stdTTL: 300,  // Waktu cache 5 menit
+    stdTTL: 100,
     checkperiod: 320
 });
 
 class MenfessController {
-    static async searchSpotifySong(req, res) {
-        try {
-          const { song } = req.query;
-          if (!song || song.trim() === '') {
-            return res.status(400).json({
-              success: false,
-              message: 'Song query is required',
-            });
-          }
-          const tracks = await SpotifyService.searchSong(song);
-          if (!tracks || tracks.length === 0) {
-            return res.status(404).json({
-              success: false,
-              message: 'No songs found',
-            });
-          }
-    
-          return res.status(200).json({
-            success: true,
-            data: tracks,
-          });
-        } catch (error) {
-          console.error('Error searching song:', error.message);
-      
-          return res.status(500).json({
-            success: false,
-            message: 'Failed to search song. Please try again later.',
-          });
-        }
-      }
-      
     static async createMenfessWithSpotify(req, res) {
         try {
           const { sender, message, spotify_id, recipient } = req.body;
@@ -53,10 +22,10 @@ class MenfessController {
       
           const { data: existingSpotify, error: spotifyCheckError } = await supabase
             .from('spotify')
-            .select('spotify_id')
+            .select('*')
             .eq('spotify_id', spotify_id)
             .single();
-      
+
           if (spotifyCheckError || !existingSpotify) {
             const trackDetails = await SpotifyService.getTrackDetails(spotify_id);
       
@@ -70,7 +39,8 @@ class MenfessController {
                   cover_url: trackDetails.cover_url,
                   external_url: trackDetails.external_url
                 })
-                .select();
+                .select()
+                .single();
       
               if (spotifyInsertError) {
                 console.error('Gagal menambahkan metadata Spotify:', spotifyInsertError);
@@ -79,6 +49,8 @@ class MenfessController {
                   message: 'Gagal menyimpan metadata Spotify',
                 });
               }
+      
+              existingSpotify = newSpotifyTrack;
             }
           }
       
@@ -90,7 +62,8 @@ class MenfessController {
               spotify_id: spotify_id,
               recipient,
             })
-            .select();
+            .select()
+            .single();
 
           if (menfessError) {
             console.error('Gagal membuat menfess:', menfessError);
@@ -103,7 +76,10 @@ class MenfessController {
           return res.status(201).json({
             success: true,
             message: 'Berhasil membuat menfess',
-            data: newMenfess[0],
+            data: {
+              ...newMenfess,
+              spotify: existingSpotify || null
+            },
           });
       
         } catch (error) {
