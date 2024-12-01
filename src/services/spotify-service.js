@@ -1,38 +1,24 @@
 const axios = require('axios');
 
 class SpotifyService {
-  static accessToken = null;
-  static tokenExpiryTime = null;
-
   static async getAccessToken() {
-    if (this.accessToken && this.tokenExpiryTime > Date.now()) {
-      return this.accessToken;
-    }
-
-    const clientId = process.env.SPOTIFY_CLIENT_ID;
-    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-    const token = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-
     try {
-      const response = await axios.post(
-        'https://accounts.spotify.com/api/token',
-        'grant_type=client_credentials',
+      const response = await axios.post('https://accounts.spotify.com/api/token', 
+        new URLSearchParams({
+          'grant_type': 'client_credentials',
+          'client_id': process.env.SPOTIFY_CLIENT_ID,
+          'client_secret': process.env.SPOTIFY_CLIENT_SECRET
+        }),
         {
           headers: {
-            Authorization: `Basic ${token}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
         }
       );
-
-      const expiresIn = response.data.expires_in * 1000;
-      this.accessToken = response.data.access_token;
-      this.tokenExpiryTime = Date.now() + expiresIn - 60000;
-
-      return this.accessToken;
+      return response.data.access_token;
     } catch (error) {
-      console.error('Error getting Spotify access token:', error.message);
-      throw new Error('Failed to authenticate with Spotify');
+      console.error('Gagal mendapatkan access token:', error.message);
+      throw new Error('Gagal mendapatkan access token Spotify');
     }
   }
 
@@ -57,8 +43,8 @@ class SpotifyService {
         cover_url: track.album.images[0]?.url || '',
       }));
     } catch (error) {
-      console.error('Error searching song in Spotify:', error.message);
-      throw new Error('Failed to fetch song from Spotify.');
+      console.error('Error mencari lagu di Spotify:', error.message);
+      throw new Error('Gagal mengambil lagu dari Spotify.');
     }
   }
 
@@ -81,7 +67,7 @@ class SpotifyService {
         external_url: track.external_urls.spotify || null,
       };
     } catch (error) {
-      console.error('Error fetching track details:', error.message);
+      console.error('Error mengambil detail track:', error.message);
       return null;
     }
   }
