@@ -33,7 +33,7 @@ const verifyCaptcha = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Captcha verification error:', error.message);
-        res.status(500).json({ message: 'Internal server error during CAPTCHA verification' });
+        res.status(500).json({ message: 'kontol' });
     }
 };
 
