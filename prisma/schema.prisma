@@ -9,7 +9,7 @@ generator client {
 // Datasource configuration for SQLite database
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = .env("DATABASE_URL")
 }
 
 // Model for storing menfess messages
