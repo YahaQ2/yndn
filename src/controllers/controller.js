@@ -35,7 +35,7 @@ class Controller {
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Menfess'
+ *                 $ref: '#/components/schemas/menfess'
  *       404:
  *         description: No menfess messages found
  *       500:
