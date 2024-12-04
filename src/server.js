@@ -38,9 +38,7 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-const express = require('express');
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocs = require('./swagger'); // Import file swagger.js
+
 
 const app = express();
 
