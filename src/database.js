@@ -1,9 +1,9 @@
 const { createClient } = require('@supabase/supabase-js');
-
+const subdata = process.env.Sub_Data;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(supabaseUrl, supabaseAnonKey, subdata);
 
 const checkConnection = async () => {
     try {
