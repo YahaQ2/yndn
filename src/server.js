@@ -13,7 +13,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
-  res.send('Hello from Server Menfess');
+  res.send('Hello from Server YUNAND Menfess:∆');
 });
 
 // Route untuk API
