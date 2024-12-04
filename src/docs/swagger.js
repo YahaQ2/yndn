@@ -39,12 +39,12 @@ const swaggerOptions = {
               description: "Penerima menfess",
             },
             createdAt: {
-              type: "string",
+              type: "timestamp",
               format: "date-time",
               description: "Tanggal dan waktu saat menfess dibuat",
             },
             updatedAt: {
-              type: "string",
+              type: "timestamp",
               format: "date-time",
               description: "Tanggal dan waktu saat menfess terakhir diperbarui",
             },
