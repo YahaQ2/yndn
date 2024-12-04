@@ -64,17 +64,17 @@ class Controller {
     
             if (error) {
                 console.error(error);
-                return res.status(500).json(response(false, false, "kontol", null));
+                return res.status(500).json(response(false, false, "Internal Server Error", null));
             }
     
             if (!menfesses || menfesses.length === 0) {
-                return res.status(404).json(response(false, false, "konto", null));
+                return res.status(404).json(response(false, false, "Menfess tidak ditemukan", null));
             }
     
             return res.status(200).json(response(true, true, null, menfesses));
         } catch (error) {
             console.error(error);
-            return res.status(500).json(response(false, false, "konlo", null));
+            return res.status(500).json(response(false, false, "Internal Server Error", null));
         }
     }
 
@@ -274,7 +274,7 @@ class Controller {
             return res.status(200).json(response(true, true, "Success delete menfess", null));
         } catch (error) {
             console.error(error);
-            return res.status(500).json(response(false, false, "kontolo", null));
+            return res.status(500).json(response(false, false, "Internal Server Error", null));
         }
     }
 }
