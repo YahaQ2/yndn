@@ -29,3 +29,13 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+//*ini baru
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 menit
+  max: 100, // Maksimum 100 permintaan per IP
+  message: "Terlalu banyak permintaan dari IP ini. Silakan coba lagi nanti.",
+});
+
+app.use(limiter);
