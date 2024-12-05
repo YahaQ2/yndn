@@ -30,5 +30,9 @@
     "swagger-ui-express": "^5.0.1",
     "yarn": "^1.22.22"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "eslint-plugin-react": "^7.37.2"
+  }
 }
