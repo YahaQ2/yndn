@@ -36,8 +36,6 @@ const limiter = rateLimit({
   message: "Terlalu banyak permintaan dari IP ini. Silakan coba lagi nanti.",
 });
 
-app.use(limiter);
-
 
 
 
