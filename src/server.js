@@ -13,7 +13,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
-  res.send('Hello from Server YUNAND Menfess:∆');
+  res.send('Hello from Server yunand Menfess');
 });
 
 // Route untuk API
@@ -27,20 +27,5 @@ app.get('/swagger.json', (req, res) => {
 });
 app.use(express.static(path.join(__dirname, '../public')));
 
-//*ini baru
-const rateLimit = require('express-rate-limit');
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 menit
-  max: 100, // Maksimum 100 permintaan per IP
-  message: "Terlalu banyak permintaan dari IP ini. Silakan coba lagi nanti.",
-});
-
-
-
-
-
-
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
