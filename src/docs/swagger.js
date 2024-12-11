@@ -10,8 +10,7 @@ const swaggerDefinition = {
   },
   "servers": [
     {
-      "url": process.env.NODE_ENV === 'production' 
-        ? 'https://unand.vercel.app' 
+      "url": 'https://unand.vercel.app' 
     },
   ],
   "paths": {
