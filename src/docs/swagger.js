@@ -16,7 +16,7 @@ const swaggerDefinition ={"openapi": "3.0.0",
     "/v1/api/menfess": {
       "get": {
         "tags": [
-          "Menfess"
+          "menfess"
         ],
         "summary": "Retrieve menfess messages",
         "parameters": [
@@ -86,7 +86,7 @@ const swaggerDefinition ={"openapi": "3.0.0",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Menfess"
+                "$ref": "#/components/schemas/menfess"
               }
             }
           },
@@ -115,7 +115,7 @@ const swaggerDefinition ={"openapi": "3.0.0",
     "/v1/api/menfess/{id}": {
       "get": {
         "tags": [
-          "Menfess"
+          "menfess"
         ],
         "summary": "Menemukan menfess berdasarkan ID",
         "parameters": [
@@ -137,7 +137,7 @@ const swaggerDefinition ={"openapi": "3.0.0",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Menfess"
+                  "$ref": "#/components/schemas/menfess"
                 }
               }
             }
@@ -172,7 +172,7 @@ const swaggerDefinition ={"openapi": "3.0.0",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Menfess"
+                "$ref": "#/components/schemas/menfess"
               }
             }
           },
@@ -184,7 +184,7 @@ const swaggerDefinition ={"openapi": "3.0.0",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Menfess"
+                  "$ref": "#/components/schemas/menfess"
                 }
               }
             }
@@ -199,7 +199,7 @@ const swaggerDefinition ={"openapi": "3.0.0",
       },
       "delete": {
         "tags": [
-          "Menfess"
+          "menfess"
         ],
         "summary": "Menghapus menfess berdasarkan ID",
         "parameters": [
