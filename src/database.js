@@ -18,8 +18,8 @@ const checkConnection = async () => {
         }
 
         console.log('Koneksi ke Supabase berhasil! Data sample:', data);
-    } catch (err) {
-        console.error('Terjadi kesalahan saat memeriksa koneksi:', err);
+    } catch (error) {
+        console.error('Terjadi kesalahan saat memeriksa koneksi:', error);
     }
 };
 
