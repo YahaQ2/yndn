@@ -10,7 +10,7 @@ const swaggerDefinition = {
   },
   "servers": [
     {
-      "url": "https://solifess.vercel.app"
+      "url": "https://unand.vercel.app"
     }
   ],
   "components": {
