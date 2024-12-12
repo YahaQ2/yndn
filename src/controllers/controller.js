@@ -280,8 +280,3 @@ class Controller {
 }
 
 module.exports = Controller;
-
-
-            }
-
-            const { data: newMenfess, error: insert
