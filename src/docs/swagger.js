@@ -10,14 +10,14 @@ const swaggerDefinition = {
   },
   "servers": [
     {
-      "url": 'https://unand.vercel.app' 
-    },
+      "url": "https://unand.vercel.app"
+    }
   ],
   "paths": {
     "/v1/api/menfess": {
       "get": {
         "tags": [
-          "menfess"
+          "Menfess"
         ],
         "summary": "Retrieve menfess messages",
         "parameters": [
@@ -64,7 +64,7 @@ const swaggerDefinition = {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/menfess"
+                    "$ref": "#/components/schemas/Menfess"
                   }
                 }
               }
@@ -87,7 +87,7 @@ const swaggerDefinition = {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/menfess"
+                "$ref": "#/components/schemas/Menfess"
               }
             }
           },
@@ -270,3 +270,7 @@ const swaggerDefinition = {
     }
   }
 }
+
+
+
+
