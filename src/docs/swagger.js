@@ -46,7 +46,7 @@ const swaggerDefinition = {
           {
             "name": "date",
             "in": "query",
-            "description": "Filter by date (format: YYYY-MM-DD)\n",
+            "description": "Filter by date (format: YYYY-MM-DD)",
             "required": false,
             "style": "form",
             "explode": true,
