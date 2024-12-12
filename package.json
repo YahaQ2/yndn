@@ -1,38 +1,19 @@
 {
-  "name": "unandfess-api",
+  "name": "yunand-menfess-backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --watch src/server.js"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "@supabase/supabase-js": "^2.46.1",
-    "axios": "^1.7.8",
-    "axios-rate-limit": "^1.4.0",
-    "body-parser": "^1.20.3",
+    "@prisma/client": "^4.14.0",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "express-rate-limit": "^7.4.1",
-    "next": "^15.0.3",
-    "node-cache": "^5.1.2",
-    "nodejs": "^0.0.0",
-    "prisma": "^5.22.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-    "yarn": "^1.22.22"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.16.0",
-    "eslint": "^9.16.0",
-    "eslint-plugin-react": "^7.37.2"
+    "nodemon": "^2.0.22",
+    "prisma": "^4.14.0"
   }
 }
