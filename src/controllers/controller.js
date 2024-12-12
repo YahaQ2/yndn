@@ -1,16 +1,7 @@
-const supabase = require('../database');
-const { response } = require('../services/response');
-const Joi = require('joi');
+const supabase = require('../database'); // Pastikan Anda sudah mengatur koneksi Supabase
+const { response } = require('../services/response'); // Pastikan Anda memiliki fungsi response
 
-// Schema untuk validasi menfess
-const menfessSchema = Joi.object({
-    sender: Joi.string().required(),
-    message: Joi.string().required(),
-    song: Joi.string().optional(),
-    recipient: Joi.string().required(),
-});
-
-class Controller {
+class MenfessController {
     /**
      * @swagger
      * /v1/api/menfess:
@@ -91,35 +82,51 @@ class Controller {
      * @swagger
      * /v1/api/menfess:
      *   post:
-     *     summary: Membuat menfess baru
+     *     summary: Create a new menfess
      *     tags: [Menfess]
      *     requestBody:
      *       required: true
      *       content:
      *         application/json:
      *           schema:
-     *             $ref: '#/components/schemas/Menfess'
+     *             type: object
+     *             properties:
+     *               sender:
+     *                 type: string
+     *               message:
+     *                 type: string
+     *               song:
+     *                 type: string
+     *               recipient:
+     *                 type: string
+     *             required:
+     *               - sender
+     *               - message
+     *               - recipient
      *     responses:
      *       201:
-     *         description: Menfess berhasil dibuat
+     *         description: Menfess successfully created
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/Menfess'
+     *               type: object
+     *               properties:
+     *                 status:
+     *                   type: boolean
+     *                 data:
+     *                   type: object
      *       400:
-     *         description: Data input tidak lengkap
+     *         description: Invalid input data
      *       500:
-     *         description: Terjadi kesalahan pada server
+     *         description: Internal server error
      */
     static async createMenfess(req, res) {
         try {
-            const { error } = menfessSchema.validate(req.body);
-            if (error) {
-                return res.status(400).json(response(false, false, error.details[0].message, null));
-            }
-
             const { sender, message, song, recipient } = req.body;
 
-            const { data: newMenfess, error: insertError } = await supabase
-                .from('menfess')
-                .insert([{ sender, message,
+            // Validasi input
+            if (!sender || !message || !recipient) {
+                return res.status(400).json(response(false, false, "Sender, message, and recipient are required", null));
+            }
+
+            const { data: newMenfess, error: insert
