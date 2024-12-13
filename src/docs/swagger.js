@@ -15,7 +15,7 @@ const swaggerDefinition = {
   ],
   "components": {
     "schemas": {
-      "Menfess": {
+      "menfess": {
         "type": "object",
         "properties": {
           "id": {
