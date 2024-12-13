@@ -1,11 +1,19 @@
-const express = require('express');
-const router = express.Router();
-const menfessController = require('../controllers/menfessController');
+const express = require('express')
+const router = express.Router()
+const Controller = require('../controllers/controller')
+const MenfessController  = require('../controllers/spotify-controller')
 
-router.get('/menfess', menfessController.getMenfesses);
-router.post('/menfess', menfessController.createMenfess);
-router.get('/menfess/:id', menfessController.getMenfessById);
-router.put('/menfess/:id', menfessController.updateMenfess);
-router.delete('/menfess/:id', menfessController.deleteMenfess);
+// Routes Menfess
+router.get('/menfess', Controller.getMenfess)
+router.post('/menfess', Controller.createMenfess)
+// router.put('/menfess/:id', MenfessController.editMenfess)
+router.get('/menfess/:id', Controller.getMenfessById)
+// router.delete('/menfess/:id', MenfessController.deleteMenfess)
 
-module.exports = router;
+// Route Menfess v2
+router.post('/menfess-spotify', MenfessController.createMenfessWithSpotify)
+router.get('/menfess-spotify-search', MenfessController.getMenfessSpotify)
+router.get('/menfess-spotify-search/:id', MenfessController.getMenfessSpotifyById)
+router.get('/search-spotify-song', MenfessController.searchSpotifySong)
+
+module.exports = router
