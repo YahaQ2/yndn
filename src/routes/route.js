@@ -6,9 +6,9 @@ const MenfessController  = require('../controllers/spotify-controller')
 // Routes Menfess
 router.get('/menfess', Controller.getMenfess)
 router.post('/menfess', Controller.createMenfess)
-router.put('/menfess/:id', MenfessController.editMenfess)
+//router.put('/menfess/:id', MenfessController.editMenfess)
 router.get('/menfess/:id', Controller.getMenfessById)
-router.delete('/menfess/:id', MenfessController.deleteMenfess)
+// router.delete('/menfess/:id', MenfessController.deleteMenfess)
 
 // Route Menfess v2
 router.post('/menfess-spotify', MenfessController.createMenfessWithSpotify)
