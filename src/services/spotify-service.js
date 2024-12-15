@@ -1,202 +1,90 @@
-const { SpotifyService, SpotifyTrackService } = require('../services/spotify-service');
-const supabase = require('../database');
-const { response } = require('../services/response');
+const axios = require('axios');
 
-class MenfessController {
-  static async createMenfessWithSpotify(req, res) {
+class SpotifyService {
+  static accessToken = null;
+  static tokenExpiryTime = null;
+
+  static async getAccessToken() {
+    if (this.accessToken && this.tokenExpiryTime > Date.now()) {
+      return this.accessToken;
+    }
+
+    const clientId = process.env.SPOTIFY_CLIENT_ID;
+    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+    const token = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+
     try {
-      const { sender, message, spotify_id, recipient } = req.body;
-  
-      if (!sender || !message || !recipient) {
-        return res.status(400).json({
-          success: false,
-          message: 'Sender, message, recipient is required',
-        });
-      }
-
-      if (!spotify_id) {
-        return res.status(400).json({
-          success: false,
-          message: 'Spotify ID is required',
-        });
-      }
-
-      const { data: newMenfess, error } = await supabase.from('menfess').insert([
+      const response = await axios.post(
+        'https://accounts.spotify.com/api/token',
+        'grant_type=client_credentials',
         {
-          sender,
-          message,
-          spotify_id: spotify_id,
-          recipient,
+          headers: {
+            Authorization: `Basic ${token}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
+
+      const expiresIn = response.data.expires_in * 1000;
+      this.accessToken = response.data.access_token;
+      this.tokenExpiryTime = Date.now() + expiresIn - 60000;
+
+      return this.accessToken;
+    } catch (error) {
+      console.error('Error getting Spotify access token:', error.message);
+      throw new Error('Failed to authenticate with Spotify');
+    }
+  }
+
+  static async searchSong(query) {
+    try {
+      const accessToken = await this.getAccessToken();
+
+      const response = await axios.get('https://api.spotify.com/v1/search', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: {
+          q: query,
+          type: 'track',
+          limit: 5,
         },
-      ]);
-  
-      if (error) {
-        console.error(error);
-        return res.status(500).json({
-          success: false,
-          message: 'Internal Server Error',
-        });
-      }
-  
-      return res.status(201).json({
-        success: true,
-        message: 'Success create menfess',
-        data: newMenfess,
       });
+
+      return response.data.tracks.items.map(track => ({
+        id: track.id,
+        name: track.name,
+        artist: track.artists.map(artist => artist.name).join(', '),
+        album: track.album.name,
+        cover_url: track.album.images[0]?.url || '',
+      }));
     } catch (error) {
-      console.error('Error creating menfess:', error.message);
-      return res.status(500).json({
-        success: false,
-        message: 'Internal Server Error',
-      });
-    }
-  }
-  
-  static async searchSpotifySong(req, res) {
-    try {
-      const { song } = req.query;
-  
-      if (!song) {
-        return res.status(400).json({
-          success: false,
-          message: 'Song query is required',
-        });
-      }
-  
-      const track = await SpotifyService.searchSong(song);
-  
-      if (!track) {
-        return res.status(404).json({
-          success: false,
-          message: 'Song not found',
-        });
-      }
-  
-      return res.status(200).json({
-        success: true,
-        data: track,
-      });
-    } catch (error) {
-      console.error('Error searching song:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to search song',
-      });
+      console.error('Error searching song in Spotify:', error.message);
+      throw new Error('Failed to fetch song from Spotify.');
     }
   }
 
-  static async getMenfessSpotify(req, res) {
+  static async getTrackDetails(menfessSpotifyId) {
     try {
-        const { sender, recipient, date, sort } = req.query;
+      const accessToken = await this.getAccessToken();
 
-        let query = supabase.from('menfess').select('*');
+      const response = await axios.get(`https://api.spotify.com/v1/tracks/${menfessSpotifyId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
 
-        if (sender) {
-            query = query.ilike('sender', `%${sender.toLowerCase()}%`);
-        }
-        if (recipient) {
-            query = query.ilike('recipient', `%${recipient.toLowerCase()}%`);
-        }
-        if (date) {
-            const formattedDate = `${date} 00:00:00`;
-            query = query.gte('created_at', formattedDate).lte('created_at', `${date} 23:59:59`);
-        }
-
-        const isAscending = sort === 'asc';
-        query = query.order('created_at', { ascending: isAscending });
-
-        const { data: menfesses, error } = await query;
-
-        if (error) {
-            console.error(error);
-            return res.status(500).json(response(false, false, "Internal Server Error", null));
-        }
-
-        if (!menfesses || menfesses.length === 0) {
-            return res.status(404).json(response(false, false, "Menfess tidak ditemukan", null));
-        }
-
-        const menfessWithTracks = await Promise.all(menfesses.map(async (menfess) => {
-            let trackDetails = null;
-
-            if (menfess.spotify_id) {
-                try {
-                    trackDetails = await SpotifyTrackService.getTrackDetails(menfess.spotify_id);
-                } catch (error) {
-                    console.error('Error fetching track details from Spotify:', error.message);
-                }
-            }
-
-            return {
-                ...menfess,
-                track: trackDetails ? {
-                    title: trackDetails.name,
-                    artist: trackDetails.artist,
-                    cover_img: trackDetails.cover_url,
-                    preview_link: trackDetails.preview_url,
-                    spotify_embed_link: `https://open.spotify.com/embed/track/${menfess.spotify_id}`
-                } : null,
-            };
-        }));
-
-        return res.status(200).json(response(true, true, null, menfessWithTracks));
+      const track = response.data;
+      return {
+        id: track.id,
+        name: track.name,
+        artist: track.artists.map(artist => artist.name).join(', '),
+        album: track.album.name,
+        cover_url: track.album.images[0]?.url || '',
+        preview_url: track.preview_url || null,
+        external_url: track.external_urls.spotify || null,
+      };
     } catch (error) {
-        console.error(error);
-        return res.status(500).json(response(false, false, "Internal Server Error", null));
-    }
-  }
-
-  static async getMenfessSpotifyById(req, res) {
-    try {
-        const id = req.params.id;
-
-        if (!id) {
-            return res.status(400).json(response(false, false, "ID is required", null));
-        }
-
-        const { data: menfess, error } = await supabase
-            .from('menfess')
-            .select('*')
-            .eq('id', id)
-            .single();
-
-        if (error) {
-            console.error(error);
-            return res.status(500).json(response(false, false, "Internal Server Error", null));
-        }
-
-        if (!menfess) {
-            return res.status(404).json(response(false, false, "Menfess tidak ditemukan", null));
-        }
-
-        let trackDetails = null;
-
-        if (menfess.spotify_id) {
-            try {
-                trackDetails = await SpotifyTrackService.getTrackDetails(menfess.spotify_id);
-            } catch (error) {
-                console.error('Error fetching track details from Spotify:', error.message);
-            }
-        }
-
-        const menfessWithTrack = {
-            ...menfess,
-            track: trackDetails ? {
-                title: trackDetails.name,
-                artist: trackDetails.artist,
-                cover_img: trackDetails.cover_url,
-                preview_link: trackDetails.preview_url,
-                spotify_embed_link: `https://open.spotify.com/embed/track/${menfess.spotify_id}`
-            } : null,
-        };
-
-        return res.status(200).json(response(true, true, null, menfessWithTrack));
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json(response(false, false, "Internal Server Error", null));
+      console.error('Error fetching track details:', error.message);
+      return null;
     }
   }
 }
 
-module.exports = MenfessController;
-
+module.exports = SpotifyService;
