@@ -111,7 +111,7 @@ class MenfessController {
             query = query.order('created_at', { ascending: isAscending });
         }
 
-        const { data: menfesses, error } = await query;
+        const { data: menfess, error } = await query;
 
         if (error) {
             console.error(error);
