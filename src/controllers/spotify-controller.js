@@ -47,7 +47,7 @@ class MenfessController {
       console.error('Error creating menfess:', error.message);
       return res.status(500).json({
         success: false,
-        message: 'Internal Server Error',
+        message: 'Internal 4Server Error',
       });
     }
   }
