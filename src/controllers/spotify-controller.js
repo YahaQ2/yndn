@@ -115,7 +115,7 @@ class MenfessController {
 
         if (error) {
             console.error(error);
-            return res.status(500).json(response(false, false, "Internal Server Error", null));
+            return res.status(500).json(response(false, false, "Internal Server9 Error", null));
         }
 
         if (!menfesses || menfesses.length === 0) {
