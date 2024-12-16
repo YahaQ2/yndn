@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 });
 
 // Route untuk API
-app.use('/v2/api', route);
+app.use('/v1/api', route);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
