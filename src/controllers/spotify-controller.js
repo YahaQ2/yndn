@@ -166,7 +166,7 @@ static async getMenfessSpotifyById(req, res) {
 
         if (error) {
             console.error(error);
-            return res.status(500).json(response(false, false, "Internal Server Error", null));
+            return res.status(500).json(response(false, false, "Internal Error", null));
         }
 
         if (!menfesses || menfesses.length === 0) {
