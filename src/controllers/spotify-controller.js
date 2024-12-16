@@ -148,7 +148,7 @@ class MenfessController {
         return res.status(200).json(response(true, true, null, menfessWithTracks));
     } catch (error) {
         console.error(error);
-        return res.status(500).json(response(false, false, "Internal Server Error", null));
+        return res.status(500).json(response(false, false, "Internal  Error", null));
     }
 }
 
