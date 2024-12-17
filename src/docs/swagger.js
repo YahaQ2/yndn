@@ -1,6 +1,21 @@
 const path = require('path');
 const swaggerJSDoc = require('swagger-jsdoc');
 
+
+import express from "express";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import { menfess, id, sender, recipient, song, updatedAt } from "./server.js";
+
+
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
+
+const app = express();
+
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
@@ -12,7 +27,7 @@ const swaggerDefinition = {
     {
       url: process.env.NODE_ENV === 'production' 
         ? 'https://unand.vercel.app' 
-        : 'http://localhost:3000',
+        : 'https://localhost:8080',
     },
   ],
   components: {

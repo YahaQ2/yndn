@@ -1,9 +1,9 @@
 {
   "name": "yunanfess-api",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "node --watch src/server.js"
+    "dev": "node src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@supabase/supabase-js": "^2.46.1",
+    "all": "^0.0.0",
     "axios": "^1.7.8",
     "axios-rate-limit": "^1.4.0",
     "body-parser": "^1.20.3",
@@ -20,9 +21,12 @@
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
     "next": "^15.0.3",
+    "node": "^23.4.0",
+    "node.js": "^0.0.1-security",
     "prisma": "^5.22.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "swagger": "^0.7.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }
