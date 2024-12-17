@@ -7,14 +7,6 @@ const path = require('path');
 const route = require('./routes/route');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger/swagger');
-
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
 // Endpoint utama
 app.get('/', (req, res) => {
   res.send('Hello from Server Menfess');
