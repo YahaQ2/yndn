@@ -199,7 +199,7 @@ static async getMenfessSpotifyById(req, res) {
         return res.status(200).json(response(true, true, null, menfessWithTracks));
     } catch (error) {
         console.error(error);
-        return res.status(500).json(response(false, false, "Internal Server Error", null));
+        return res.status(500).json(response(false, false, "Internal kocak Server Error", null));
     }
 }
 
