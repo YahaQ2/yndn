@@ -25,13 +25,5 @@ app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`)
 
 
 
-
-
-import express from "express";
-import swaggerJSDoc from "swagger-jsdoc";
-import swaggerUi from "swagger-ui-express";
-import { create, getAll, getById, remove, update } from "./swagger.js";
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
