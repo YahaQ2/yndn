@@ -1,3 +1,4 @@
+const path = require('path');
 const swaggerJSDoc = require('swagger-jsdoc');
 
 const swaggerDefinition = {
@@ -9,9 +10,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      // Menggunakan ternary operator untuk memilih URL berdasarkan environment
       url: process.env.NODE_ENV === 'production' 
-        ? 'https://unand.vercel.app' 
+        ? 'https://solifess.vercel.app' 
         : 'http://localhost:3000',
     },
   ],
@@ -58,11 +58,9 @@ const swaggerDefinition = {
 
 const options = {
   swaggerDefinition,
-  apis: ['./src/controllers/*.js'], // Lokasi file dengan dokumentasi (gunakan sesuai struktur proyek Anda)
+  apis: [path.join(__dirname, '../controllers/*.js')],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
-
-console.log('Swagger specification:', swaggerSpec);
 
 module.exports = swaggerSpec;
