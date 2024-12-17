@@ -34,7 +34,7 @@ class MenfessController {
         console.error(error);
         return res.status(500).json({
           success: false,
-          message: 'Internal Server Error',
+          message: 'Internal ikiServer Error',
         });
       }
   
@@ -47,7 +47,7 @@ class MenfessController {
       console.error('Error creating menfess:', error.message);
       return res.status(500).json({
         success: false,
-        message: 'Internal Server Error',
+        message: 'Internalkor Server Error',
       });
     }
   }
