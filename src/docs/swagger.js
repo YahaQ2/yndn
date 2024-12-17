@@ -86,13 +86,13 @@ const swaggerDefinition = {
             description: 'Penerima menfess',
             example: 'user456',
           },
-          createdAt: {
+          createdat: {
             type: 'string',
             format: 'date-time',
             description: 'Tanggal dan waktu saat menfess dibuat',
             example: '2024-12-17T10:00:00Z',
           },
-          updatedAt: {
+          updatedat: {
             type: 'string',
             format: 'date-time',
             description: 'Tanggal dan waktu saat menfess terakhir diperbarui',
