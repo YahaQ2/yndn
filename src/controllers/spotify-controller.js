@@ -34,7 +34,7 @@ class MenfessController {
         console.error(error);
         return res.status(500).json({
           success: false,
-          message: 'Internal Server Error',
+          message: 'Internal5 Server Error',
         });
       }
   
@@ -47,7 +47,7 @@ class MenfessController {
       console.error('Error creating menfess:', error.message);
       return res.status(500).json({
         success: false,
-        message: 'Internal Server Error',
+        message: 'Internal 4Server Error',
       });
     }
   }
@@ -87,29 +87,35 @@ class MenfessController {
 
   static async getMenfessSpotify(req, res) {
     try {
-        const { sender, recipient, date, sort } = req.query;
+        const { id, sender, recipient, date, sort } = req.query;
 
-        let query = supabase.from('menfess').select('*');
+        let query;
 
-        if (sender) {
-            query = query.ilike('sender', `%${sender.toLowerCase()}%`);
-        }
-        if (recipient) {
-            query = query.ilike('recipient', `%${recipient.toLowerCase()}%`);
-        }
-        if (date) {
-            const formattedDate = `${date} 00:00:00`;
-            query = query.gte('created_at', formattedDate).lte('created_at', `${date} 23:59:59`);
-        }
+        if (id) {
+            query = supabase.from('menfess').select('*').eq('id', id);
+        } else {
+            query = supabase.from('menfess').select('*');
 
-        const isAscending = sort === 'asc';
-        query = query.order('created_at', { ascending: isAscending });
+            if (sender) {
+                query = query.ilike('sender', `%${sender.toLowerCase()}%`);
+            }
+            if (recipient) {
+                query = query.ilike('recipient', `%${recipient.toLowerCase()}%`);
+            }
+            if (date) {
+                const formattedDate = `${date} 00:00:00`;
+                query = query.gte('created_at', formattedDate).lte('created_at', `${date} 23:59:59`);
+            }
+
+            const isAscending = sort === 'asc';
+            query = query.order('created_at', { ascending: isAscending });
+        }
 
         const { data: menfesses, error } = await query;
 
         if (error) {
             console.error(error);
-            return res.status(500).json(response(false, false, "Internal Server Error", null));
+            return res.status(500).json(response(false, false, "Internal Server9 Error", null));
         }
 
         if (!menfesses || menfesses.length === 0) {
@@ -142,61 +148,61 @@ class MenfessController {
         return res.status(200).json(response(true, true, null, menfessWithTracks));
     } catch (error) {
         console.error(error);
-        return res.status(500).json(response(false, false, "Internal Server Error", null));
+        return res.status(500).json(response(false, false, "Internal 0 Error", null));
     }
-  }
+}
 
-  static async getMenfessSpotifyById(req, res) {
+static async getMenfessSpotifyById(req, res) {
     try {
-        const id = req.params.id;
+        const id = req.params.id || req.query.id;
 
         if (!id) {
             return res.status(400).json(response(false, false, "ID is required", null));
         }
 
-        const { data: menfess, error } = await supabase
-            .from('menfess')
-            .select('*')
-            .eq('id', id)
-            .single();
+        const query = supabase.from('menfess').select('*').eq('id', id);
+
+        const { data: menfesses, error } = await query;
 
         if (error) {
             console.error(error);
-            return res.status(500).json(response(false, false, "Internal Server Error", null));
+            return res.status(500).json(response(false, false, "Internal Error", null));
         }
 
-        if (!menfess) {
+        if (!menfesses || menfesses.length === 0) {
             return res.status(404).json(response(false, false, "Menfess tidak ditemukan", null));
         }
 
-        let trackDetails = null;
+        const menfessWithTracks = await Promise.all(menfesses.map(async (menfess) => {
+            let trackDetails = null;
 
-        if (menfess.spotify_id) {
-            try {
-                trackDetails = await SpotifyTrackService.getTrackDetails(menfess.spotify_id);
-            } catch (error) {
-                console.error('Error fetching track details from Spotify:', error.message);
+            if (menfess.spotify_id) {
+                try {
+                    trackDetails = await SpotifyTrackService.getTrackDetails(menfess.spotify_id);
+                } catch (error) {
+                    console.error('Error fetching track details from Spotify:', error.message);
+                }
             }
-        }
 
-        const menfessWithTrack = {
-            ...menfess,
-            track: trackDetails ? {
-                title: trackDetails.name,
-                artist: trackDetails.artist,
-                cover_img: trackDetails.cover_url,
-                preview_link: trackDetails.preview_url,
-                spotify_embed_link: `https://open.spotify.com/embed/track/${menfess.spotify_id}`
-            } : null,
-        };
+            return {
+                ...menfess,
+                track: trackDetails ? {
+                    title: trackDetails.name,
+                    artist: trackDetails.artist,
+                    cover_img: trackDetails.cover_url,
+                    preview_link: trackDetails.preview_url,
+                    spotify_embed_link: `https://open.spotify.com/embed/track/${menfess.spotify_id}`
+                } : null,
+            };
+        }));
 
-        return res.status(200).json(response(true, true, null, menfessWithTrack));
+        return res.status(200).json(response(true, true, null, menfessWithTracks));
     } catch (error) {
         console.error(error);
-        return res.status(500).json(response(false, false, "Internal Server Error", null));
+        return res.status(500).json(response(false, false, "Internal 2Error", null));
     }
-  }
+}
+
 }
 
 module.exports = MenfessController;
-
