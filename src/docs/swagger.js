@@ -2,284 +2,124 @@ const path = require('path');
 const swaggerJSDoc = require('swagger-jsdoc');
 
 const swaggerDefinition = {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "API Documentation",
-    "description": "Dokumentasi API dengan Swagger",
-    "version": "1.0.0"
+  openapi: '3.0.0',
+  info: {
+    title: 'API Documentation',
+    version: '1.0.0',
+    description: 'Dokumentasi API dengan Swagger',
   },
-  "servers": [
+  servers: [
     {
-      "url": "https://unand.vercel.app"
-    }
-  ],
-  "paths": {
-    "/v1/api/menfess": {
-      "get": {
-        "tags": [
-          "Menfess"
-        ],
-        "summary": "Retrieve menfess messages",
-        "parameters": [
-          {
-            "name": "sender",
-            "in": "query",
-            "description": "Filter by sender name",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "recipient",
-            "in": "query",
-            "description": "Filter by recipient name",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "date",
-            "in": "query",
-            "description": "Filter by date (format: YYYY-MM-DD)\n",
-            "required": false,
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful retrieval of menfess messages",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Menfess"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No menfess messages found"
-          },
-          "500": {
-            "description": "Internal server error"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Menfess"
-        ],
-        "summary": "Membuat menfess baru",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Menfess"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Menfess berhasil dibuat",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Menfess"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Data input tidak lengkap"
-          },
-          "500": {
-            "description": "Terjadi kesalahan pada server"
-          }
-        }
-      }
+      url: process.env.NODE_ENV === 'production' 
+        ? 'https://unand.vercel.app' 
+        : 'http://localhost:3000',
     },
-    "/v1/api/menfess/{id}": {
-      "get": {
-        "tags": [
-          "Menfess"
-        ],
-        "summary": "Menemukan menfess berdasarkan ID",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID menfess yang akan diperbarui",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Menfess berhasil diperbarui",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Menfess"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Menfess tidak ditemukan"
-          },
-          "500": {
-            "description": "Terjadi kesalahan pada server"
-          }
-        }
+  ],
+  components: {
+    securitySchemes: {
+      BearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
       },
-      "put": {
-        "tags": [
-          "Menfess"
-        ],
-        "summary": "Memperbarui menfess berdasarkan ID",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID menfess yang akan diperbarui",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Menfess"
-              }
-            }
+    },
+    responses: {
+      NotFound: {
+        description: 'Resource tidak ditemukan',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                message: {
+                  type: 'string',
+                  example: 'Resource not found',
+                },
+              },
+            },
           },
-          "required": true
         },
-        "responses": {
-          "200": {
-            "description": "Menfess berhasil diperbarui",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Menfess"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Menfess tidak ditemukan"
-          },
-          "500": {
-            "description": "Terjadi kesalahan pada server"
-          }
-        }
       },
-      "delete": {
-        "tags": [
-          "Menfess"
-        ],
-        "summary": "Menghapus menfess berdasarkan ID",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID menfess yang akan dihapus",
-            "required": true,
-            "style": "simple",
-            "explode": false,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Menfess berhasil dihapus"
+      ServerError: {
+        description: 'Terjadi kesalahan pada server',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                message: {
+                  type: 'string',
+                  example: 'Internal server error',
+                },
+              },
+            },
           },
-          "404": {
-            "description": "Menfess tidak ditemukan"
+        },
+      },
+    },
+    schemas: {
+      Menfess: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'integer',
+            description: 'ID menfess yang unik',
+            example: 1,
           },
-          "500": {
-            "description": "Terjadi kesalahan pada server"
-          }
-        }
-      }
-    }
+          sender: {
+            type: 'string',
+            description: 'Pengirim menfess',
+            example: 'user123',
+          },
+          message: {
+            type: 'string',
+            description: 'Pesan dari menfess',
+            example: 'Halo, ini pesan menfess!',
+          },
+          song: {
+            type: 'string',
+            description: 'Lagu terkait dengan menfess (opsional)',
+            example: 'Imagine - John Lennon',
+          },
+          recipient: {
+            type: 'string',
+            description: 'Penerima menfess',
+            example: 'user456',
+          },
+          createdAt: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Tanggal dan waktu saat menfess dibuat',
+            example: '2024-12-17T10:00:00Z',
+          },
+          updatedAt: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Tanggal dan waktu saat menfess terakhir diperbarui',
+            example: '2024-12-17T12:00:00Z',
+          },
+        },
+      },
+    },
   },
-  "components": {
-    "schemas": {
-      "Menfess": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "description": "ID menfess yang unik"
-          },
-          "sender": {
-            "type": "string",
-            "description": "Pengirim menfess"
-          },
-          "message": {
-            "type": "string",
-            "description": "Pesan dari menfess"
-          },
-          "song": {
-            "type": "string",
-            "description": "Lagu terkait dengan menfess (opsional)"
-          },
-          "recipient": {
-            "type": "string",
-            "description": "Penerima menfess"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "Tanggal dan waktu saat menfess dibuat",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "description": "Tanggal dan waktu saat menfess terakhir diperbarui",
-            "format": "date-time"
-          }
-        }
-      }
-    }
-  }
-}
+  security: [
+    {
+      BearerAuth: [],
+    },
+  ],
+  tags: [
+    {
+      name: 'Menfess',
+      description: 'Endpoint terkait dengan Menfess',
+    },
+  ],
 };
 
 const options = {
   swaggerDefinition,
-  apis: [path.join(__dirname, '../controllers/*.js')],
+  apis: [path.join(__dirname, '../controllers/*.js')], // Pastikan lokasi file controller sesuai
 };
 
 const swaggerSpec = swaggerJSDoc(options);
 
-module.exports = swaggerSpec
-
-
-
+module.exports = swaggerSpec;
