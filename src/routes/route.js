@@ -1,19 +1,50 @@
-const express = require('express')
-const router = express.Router()
-const Controller = require('../controllers/controller')
-const MenfessController  = require('../controllers/spotify-controller')
+const express = require('express');
+const { supabase } = require('../database');
+const router = express.Router();
 
-// Routes Menfess
-router.get('/menfess', Controller.getMenfess)
-router.post('/menfess', Controller.createMenfess)
-// router.put('/menfess/:id', MenfessController.editMenfess)
-router.get('/menfess/:id', Controller.getMenfessById)
-// router.delete('/menfess/:id', MenfessController.deleteMenfess)
+// Endpoint: Ambil semua komentar untuk pesan tertentu
+router.get('/comments', async (req, res) => {
+    const { messageId } = req.query;
 
-// Route Menfess v2
-router.post('/menfess-spotify', MenfessController.createMenfessWithSpotify)
-router.get('/menfess-spotify-search', MenfessController.getMenfessSpotify)
-router.get('/menfess-spotify-search/:id', MenfessController.getMenfessSpotifyById)
-router.get('/search-spotify-song', MenfessController.searchSpotifySong)
+    if (!messageId) {
+        return res.status(400).json({ message: 'Parameter messageId wajib diisi' });
+    }
 
-module.exports = router
+    try {
+        const { data, error } = await supabase
+            .from('comments')
+            .select('*')
+            .eq('messageId', messageId);
+
+        if (error) {
+            return res.status(500).json({ message: 'Gagal mengambil komentar', error });
+        }
+
+        res.status(200).json(data);
+    } catch (err) {
+        res.status(500).json({ message: 'Terjadi kesalahan', error: err.message });
+    }
+});
+
+// Endpoint: Tambah komentar baru
+router.post('/comments', async (req, res) => {
+    const { messageId, content } = req.body;
+
+    if (!messageId || !content) {
+        return res.status(400).json({ message: 'Semua data wajib diisi' });
+    }
+
+    try {
+        const { data, error } = await supabase
+            .from('comments')
+            .insert([{ messageId, content }]);
+
+        if (error) {
+            return res.status(500).json({ message: 'Gagal menambahkan komentar', error });
+        }
+
+        res.status(201).json(data[0]); // Mengembalikan komentar yang baru ditambahkan
+    } catch (err) {
+        res.status(500).json({ message: 'Terjadi kesalahan', error: err.message });
+    }
+});
