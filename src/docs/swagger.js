@@ -58,7 +58,7 @@ const swaggerDefinition = {
       },
     },
     schemas: {
-      Menfess: {
+      comments: {
         type: 'object',
         properties: {
           id: {
@@ -71,8 +71,8 @@ const swaggerDefinition = {
             description: 'Pengirim menfess',
             example: 'user123',
           },
-          message: {
-            type: 'string',
+          messageId: {
+            type: 'integer',
             description: 'Pesan dari menfess',
             example: 'Halo, ini pesan menfess!',
           },
@@ -81,7 +81,7 @@ const swaggerDefinition = {
             description: 'Lagu terkait dengan menfess (opsional)',
             example: 'Imagine - John Lennon',
           },
-          recipient: {
+          content: {
             type: 'string',
             description: 'Penerima menfess',
             example: 'user456',
@@ -109,7 +109,7 @@ const swaggerDefinition = {
   ],
   tags: [
     {
-      name: 'Menfess',
+      name: 'comments',
       description: 'Endpoint terkait dengan Menfess',
     },
   ],
