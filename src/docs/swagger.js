@@ -1,125 +1,264 @@
-const path = require('path');
-const swaggerJSDoc = require('swagger-jsdoc');
-
-const swaggerDefinition = {
-  openapi: '3.0.0',
-  info: {
-    title: 'API Documentation',
-    version: '1.0.0',
-    description: 'Dokumentasi API dengan Swagger',
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Messages and Comments API",
+    "version": "1.0.0",
+    "description": "API untuk mengelola pesan dan komentar menggunakan Supabase"
   },
-  servers: [
+  "servers": [
     {
-      url: process.env.NODE_ENV === 'production' 
-        ? 'https://yunand.vercel.app' 
-        : 'http://localhost:3000',
-    },
+      "url": "https://unand.vercel.app/v1/api",
+      "description": "API Production"
+    }
   ],
-  components: {
-    securitySchemes: {
-      BearerAuth: {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
+  "paths": {
+    "/messages": {
+      "get": {
+        "summary": "Ambil semua pesan",
+        "responses": {
+          "200": {
+            "description": "Daftar semua pesan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Message"
+                  }
+                }
+              }
+            }
+          }
+        }
       },
+      "post": {
+        "summary": "Tambah pesan baru",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pesan berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          }
+        }
+      }
     },
-    responses: {
-      NotFound: {
-        description: 'Resource tidak ditemukan',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                message: {
-                  type: 'string',
-                  example: 'Resource not found',
-                },
-              },
+    "/messages/{id}": {
+      "get": {
+        "summary": "Ambil pesan berdasarkan ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
             },
+            "description": "ID pesan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail pesan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
           },
-        },
+          "404": {
+            "description": "Pesan tidak ditemukan"
+          }
+        }
       },
-      ServerError: {
-        description: 'Terjadi kesalahan pada server',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                message: {
-                  type: 'string',
-                  example: 'Internal server error',
-                },
-              },
+      "delete": {
+        "summary": "Hapus pesan berdasarkan ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
             },
+            "description": "ID pesan"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Pesan berhasil dihapus"
           },
-        },
-      },
+          "404": {
+            "description": "Pesan tidak ditemukan"
+          }
+        }
+      }
     },
-    schemas: {
-      comments: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'integer',
-            description: 'ID menfess yang unik',
-            example: 1,
-          },
-          sender: {
-            type: 'string',
-            description: 'Pengirim menfess',
-            example: 'user123',
-          },
-          messageId: {
-            type: 'integer',
-            description: 'Pesan dari menfess',
-            example: 'Halo, ini pesan menfess!',
-          },
-          song: {
-            type: 'string',
-            description: 'Lagu terkait dengan menfess (opsional)',
-            example: 'Imagine - John Lennon',
-          },
-          content: {
-            type: 'string',
-            description: 'Penerima menfess',
-            example: 'user456',
-          },
-          createdAt: {
-            type: 'string',
-            format: 'date-time',
-            description: 'Tanggal dan waktu saat menfess dibuat',
-            example: '2024-12-17T10:00:00Z',
-          },
-          updatedAt: {
-            type: 'string',
-            format: 'date-time',
-            description: 'Tanggal dan waktu saat menfess terakhir diperbarui',
-            example: '2024-12-17T12:00:00Z',
-          },
+    "/comments": {
+      "post": {
+        "summary": "Tambah komentar baru",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewComment"
+              }
+            }
+          }
         },
-      },
+        "responses": {
+          "201": {
+            "description": "Komentar berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          }
+        }
+      }
     },
+    "/comments?messageId={messageId}": {
+      "get": {
+        "summary": "Ambil komentar berdasarkan ID pesan",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID pesan"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar komentar untuk pesan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   },
-  security: [
-    {
-      BearerAuth: [],
-    },
-  ],
-  tags: [
-    {
-      name: 'comments',
-      description: 'Endpoint terkait dengan Menfess',
-    },
-  ],
-};
-
-const options = {
-  swaggerDefinition,
-  apis: [path.join(__dirname, '../controllers/*.js')], // Pastikan lokasi file controller sesuai
-};
-
-const swaggerSpec = swaggerJSDoc(options);
-
-module.exports = swaggerSpec;
+  "components": {
+    "schemas": {
+      "Message": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "sender": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "recipient": {
+            "type": "string",
+            "example": "Jane Doe"
+          },
+          "message": {
+            "type": "string",
+            "example": "Hello, this is a message."
+          },
+          "track": {
+            "type": "string",
+            "example": "https://open.spotify.com/embed/track/123456789"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-12-20T14:48:00.000Z"
+          }
+        }
+      },
+      "NewMessage": {
+        "type": "object",
+        "required": ["sender", "recipient", "message"],
+        "properties": {
+          "sender": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "recipient": {
+            "type": "string",
+            "example": "Jane Doe"
+          },
+          "message": {
+            "type": "string",
+            "example": "Hello, this is a message."
+          },
+          "track": {
+            "type": "string",
+            "example": "https://open.spotify.com/embed/track/123456789"
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "content": {
+            "type": "string",
+            "example": "This is a comment."
+          },
+          "messageId": {
+            "type": "integer",
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-12-20T14:50:00.000Z"
+          }
+        }
+      },
+      "NewComment": {
+        "type": "object",
+        "required": ["content", "messageId"],
+        "properties": {
+          "content": {
+            "type": "string",
+            "example": "This is a comment."
+          },
+          "messageId": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      }
+    }
+  }
+}
