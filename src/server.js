@@ -34,8 +34,3 @@ app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`)
 
 
 
-const commentsRoutes = require("./routes/comments");
-
-// Routes
-app.use("/api/comments", commentsRoutes);
-
