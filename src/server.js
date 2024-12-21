@@ -3,36 +3,26 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const route = require('./routes/route');
-const app = express();
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./docs/swagger');
+const swaggerJsdoc = require('swagger-jsdoc');
 const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
+// Inisialisasi aplikasi dan Supabase client
+const app = express();
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const PORT = process.env.PORT || 5000;
+
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
+// Endpoint root
 app.get('/', (req, res) => {
   res.send('Hello from Server Menfess');
 });
 
-// Route untuk API
-app.use('/v1/api', route);
-
-// Route Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.get('/swagger.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-  res.send(swaggerSpec);
-});
-app.use(express.static(path.join(__dirname, '../public')));
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
-
-
-
-
+// Konfigurasi Swagger
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -43,17 +33,18 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `http://localhost:${port}`,
+        url: `http://localhost:${PORT}`,
         description: 'Development server',
       },
     ],
   },
-  apis: ['./server.js'], // Path to the API docs
+  apis: ['./server.js'], // Path ke file ini untuk dokumentasi Swagger
 };
 
-const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// API untuk pesan
 /**
  * @swagger
  * /api/messages/{id}:
@@ -89,6 +80,7 @@ app.get('/api/messages/:id', async (req, res) => {
   }
 });
 
+// API untuk komentar
 /**
  * @swagger
  * /api/comments:
@@ -163,8 +155,11 @@ app.post('/api/comments', async (req, res) => {
   }
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  console.log(`Swagger documentation available at http://localhost:${port}/api-docs`);
+// Serve file statis
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Jalankan server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Swagger documentation available at http://localhost:${PORT}/api-docs`);
 });
