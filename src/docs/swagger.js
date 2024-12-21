@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://unand.vercel.app/v1/api",
+      "url": "https://yunand.vercel.app/v1/api",
       "description": "API Production"
     }
   ],
