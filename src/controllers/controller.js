@@ -1,39 +1,21 @@
-const pool = require("../models/db");
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
-// Get comments by messageId
-const getCommentsByMessageId = async (req, res) => {
-  const { messageId } = req.query;
-
-  try {
-    const result = await pool.query(
-      "SELECT * FROM comments WHERE message_id = $1 ORDER BY created_at ASC",
-      [messageId]
-    );
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch comments" });
-  }
-};
-
-// Add a new comment
-const addComment = async (req, res) => {
-  const { messageId, content } = req.body;
-
-  if (!messageId || !content) {
-    return res.status(400).json({ error: "messageId and content are required" });
-  }
+exports.getMessage = async (req, res) => {
+  const { id } = req.params;
 
   try {
-    const result = await pool.query(
-      "INSERT INTO comments (message_id, content) VALUES ($1, $2) RETURNING *",
-      [messageId, content]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to add comment" });
+    const message = await prisma.message.findUnique({
+      where: { id: parseInt(id) },
+      include: { track: true },
+    });
+
+    if (!message) {
+      return res.status(404).json({ status: false, message: 'Message not found' });
+    }
+
+    res.json({ status: true, data: [message] });
+  } catch (error) {
+    res.status(500).json({ status: false, message: error.message });
   }
 };
-
-module.exports = { getCommentsByMessageId, addComment };
