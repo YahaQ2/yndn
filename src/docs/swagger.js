@@ -1,4 +1,7 @@
-{
+const path = require('path');
+const swaggerJSDoc = require('swagger-jsdoc');
+
+const swaggerDefinition = {
   "openapi": "3.0.0",
   "info": {
     "title": "Messages and Comments API",
@@ -262,3 +265,12 @@
     }
   }
 }
+
+const options = {
+  swaggerDefinition,
+  apis: [path.join(__dirname, '../controllers/*.js')],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
+module.exports = swaggerSpec
