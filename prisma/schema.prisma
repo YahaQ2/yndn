@@ -3,24 +3,31 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // Sesuaikan dengan database Supabase (PostgreSQL)
-  url      = env("DATABASE_URL") // Tambahkan URL database Supabase di .env
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Message {
-  id          Int       @id @default(autoincrement())
-  sender      String
-  recipient   String
-  message     String
-  track       String?   // Spotify embed link (opsional)
-  createdAt   DateTime  @default(now())
-  comments    Comment[] // Relasi one-to-many dengan tabel comments
+  id         Int       @id @default(autoincrement())
+  sender     String
+  recipient  String
+  message    String
+  created_at DateTime  @default(now())
+  comments   Comment[]
+  track      Track?
 }
 
 model Comment {
-  id        Int       @id @default(autoincrement())
-  content   String
-  message   Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  messageId Int
-  createdAt DateTime  @default(now())
+  id         Int      @id @default(autoincrement())
+  content    String
+  messageId  Int
+  created_at DateTime @default(now())
+  message    Message  @relation(fields: [messageId], references: [id])
+}
+
+model Track {
+  id                 Int     @id @default(autoincrement())
+  spotify_embed_link String
+  messageId          Int     @unique
+  message            Message @relation(fields: [messageId], references: [id])
 }
