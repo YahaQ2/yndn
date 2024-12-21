@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
   res.send('Hello from Server Menfess');
 });
 
-// Konfigurasi Swagger
+// Swagger configuration
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -44,7 +44,7 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// API untuk pesan
+// Routes
 /**
  * @swagger
  * /api/messages/{id}:
@@ -80,7 +80,6 @@ app.get('/api/messages/:id', async (req, res) => {
   }
 });
 
-// API untuk komentar
 /**
  * @swagger
  * /api/comments:
@@ -156,7 +155,7 @@ app.post('/api/comments', async (req, res) => {
 });
 
 // Serve file statis
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Jalankan server
 app.listen(PORT, () => {
