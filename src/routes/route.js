@@ -1,50 +1,70 @@
 const express = require('express');
-const { supabase } = require('../database');
 const router = express.Router();
+const messageController = require('../controllers/messageController');
+const commentController = require('../controllers/commentController');
 
-// Endpoint: Ambil semua komentar untuk pesan tertentu
-router.get('/comments', async (req, res) => {
-    const { messageId } = req.query;
+/**
+ * @swagger
+ * /api/messages/{id}:
+ *   get:
+ *     summary: Get a message by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *       404:
+ *         description: Message not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/messages/:id', messageController.getMessage);
 
-    if (!messageId) {
-        return res.status(400).json({ message: 'Parameter messageId wajib diisi' });
-    }
+/**
+ * @swagger
+ * /api/comments:
+ *   get:
+ *     summary: Get comments for a message
+ *     parameters:
+ *       - in: query
+ *         name: messageId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *       500:
+ *         description: Server error
+ */
+router.get('/comments', commentController.getComments);
 
-    try {
-        const { data, error } = await supabase
-            .from('comments')
-            .select('*')
-            .eq('messageId', messageId);
+/**
+ * @swagger
+ * /api/comments:
+ *   post:
+ *     summary: Add a new comment
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               messageId:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Comment created successfully
+ *       500:
+ *         description: Server error
+ */
+router.post('/comments', commentController.addComment);
 
-        if (error) {
-            return res.status(500).json({ message: 'Gagal mengambil komentar', error });
-        }
-
-        res.status(200).json(data);
-    } catch (err) {
-        res.status(500).json({ message: 'Terjadi kesalahan', error: err.message });
-    }
-});
-
-// Endpoint: Tambah komentar baru
-router.post('/comments', async (req, res) => {
-    const { messageId, content } = req.body;
-
-    if (!messageId || !content) {
-        return res.status(400).json({ message: 'Semua data wajib diisi' });
-    }
-
-    try {
-        const { data, error } = await supabase
-            .from('comments')
-            .insert([{ messageId, content }]);
-
-        if (error) {
-            return res.status(500).json({ message: 'Gagal menambahkan komentar', error });
-        }
-
-        res.status(201).json(data[0]); // Mengembalikan komentar yang baru ditambahkan
-    } catch (err) {
-        res.status(500).json({ message: 'Terjadi kesalahan', error: err.message });
-    }
-});
+module.exports = router;
