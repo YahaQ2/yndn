@@ -1,31 +1,21 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const { supabase } = require('../database');
 
-exports.getComments = async (req, res) => {
-  const { messageId } = req.query;
-
-  try {
-    const comments = await prisma.comment.findMany({
-      where: { messageId: parseInt(messageId) },
-      orderBy: { created_at: 'asc' },
-    });
-
-    res.json(comments);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-exports.addComment = async (req, res) => {
-  const { messageId, content } = req.body;
+// Mendapatkan pesan berdasarkan `id`
+exports.getMessage = async (req, res) => {
+  const { id } = req.params;
 
   try {
-    const comment = await prisma.comment.create({
-      data: { messageId: parseInt(messageId), content },
-    });
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*, track(*)')
+      .eq('id', parseInt(id))
+      .single();
 
-    res.status(201).json(comment);
+    if (error) throw error;
+    if (!data) return res.status(404).json({ status: false, message: 'Message not found' });
+
+    res.json({ status: true, data });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ status: false, message: error.message });
   }
 };
