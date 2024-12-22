@@ -1,91 +1,120 @@
 const path = require('path');
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerDocument = {
+const swaggerJSDoc = require('swagger-jsdoc');{
   "openapi": "3.0.0",
   "info": {
-    "title": "Messages and Comments API",
+    "title": "Comments API",
     "version": "1.0.0",
-    "description": "API untuk mengelola pesan dan komentar menggunakan Supabase"
+    "description": "API for managing comments on messages"
   },
-  "servers": [
-    {
-      "url": "https://yunand.vercel.app",
-      "description": "API Production"
-    }
-  ],
   "paths": {
-    "/messages": {
-      "get": {
-        "summary": "Ambil semua pesan",
-        "responses": {
-          "200": {
-            "description": "Daftar semua pesan",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Message"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
+    "/comments": {
       "post": {
-        "summary": "Tambah pesan baru",
+        "summary": "Create a new comment",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewMessage"
+                "type": "object",
+                "properties": {
+                  "content": { "type": "string" },
+                  "userId": { "type": "string" },
+                  "messageId": { "type": "string" }
+                },
+                "required": ["content", "userId", "messageId"]
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Pesan berhasil dibuat",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
+          "201": { "description": "Comment created successfully" },
+          "500": { "description": "Error creating comment" }
+        }
+      }
+    },
+    "/comments/{messageId}": {
+      "get": {
+        "summary": "Get all comments for a message",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of comments" },
+          "500": { "description": "Error fetching comments" }
+        }
+      }
+    },
+    "/comments/{id}": {
+      "put": {
+        "summary": "Update a comment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": { "type": "string" },
+                  "userId": { "type": "string" }
+                },
+                "required": ["content", "userId"]
               }
             }
           }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Message": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "sender": { "type": "string", "example": "John Doe" },
-          "recipient": { "type": "string", "example": "Jane Doe" },
-          "message": { "type": "string", "example": "Hello, this is a message." },
-          "track": { "type": "string", "example": "https://open.spotify.com/embed/track/123456789" },
-          "createdAt": { "type": "string", "format": "date-time", "example": "2024-12-20T14:48:00.000Z" }
+        },
+        "responses": {
+          "200": { "description": "Comment updated successfully" },
+          "403": { "description": "Unauthorized" },
+          "500": { "description": "Error updating comment" }
         }
       },
-      "NewMessage": {
-        "type": "object",
-        "required": ["sender", "recipient", "message"],
-        "properties": {
-          "sender": { "type": "string", "example": "John Doe" },
-          "recipient": { "type": "string", "example": "Jane Doe" },
-          "message": { "type": "string", "example": "Hello, this is a message." },
-          "track": { "type": "string", "example": "https://open.spotify.com/embed/track/123456789" }
+      "delete": {
+        "summary": "Delete a comment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": { "type": "string" }
+                },
+                "required": ["userId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Comment deleted successfully" },
+          "403": { "description": "Unauthorized" },
+          "500": { "description": "Error deleting comment" }
         }
       }
     }
   }
 }
+const swaggerDocument = 
 };
 
 module.exports = swaggerDocument;
