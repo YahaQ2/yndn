@@ -1,21 +1,37 @@
 const { supabase } = require('../database');
 
-// Mendapatkan pesan berdasarkan `id`
-exports.getMessage = async (req, res) => {
-  const { id } = req.params;
+// Mendapatkan komentar berdasarkan `messageId`
+exports.getComments = async (req, res) => {
+  const { messageId } = req.query;
 
   try {
     const { data, error } = await supabase
-      .from('messages')
-      .select('*, track(*)')
-      .eq('id', parseInt(id))
-      .single();
+      .from('comments')
+      .select('*')
+      .eq('messageId', parseInt(messageId))
+      .order('created_at', { ascending: true });
 
     if (error) throw error;
-    if (!data) return res.status(404).json({ status: false, message: 'Message not found' });
 
-    res.json({ status: true, data });
+    res.json(data);
   } catch (error) {
-    res.status(500).json({ status: false, message: error.message });
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Menambahkan komentar baru
+exports.addComment = async (req, res) => {
+  const { messageId, content } = req.body;
+
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .insert([{ messageId: parseInt(messageId), content }]);
+
+    if (error) throw error;
+
+    res.status(201).json(data[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
