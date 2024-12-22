@@ -1,3 +1,5 @@
+const path = require('path');
+const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerDocument = {
 openapi: 3.0.0
 info:
@@ -180,3 +182,12 @@ components:
 };
 
 module.exports = swaggerDocument;
+const options = {
+  swaggerDefinition,
+  apis: [path.join(__dirname, '../controllers/*.js')],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
+module.exports = swaggerSpec
+
