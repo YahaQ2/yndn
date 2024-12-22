@@ -7,27 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Message {
-  id         Int       @id @default(autoincrement())
-  sender     String
-  recipient  String
-  message    String
-  created_at DateTime  @default(now())
-  comments   Comment[]
-  track      Track?
-}
+model Comments {
+  id        Int      @id @default(autoincrement())
+  content   String
+  userId    String   // UUID dari user yang mengomentari
+  messageId String   // UUID dari menfess/message
+  createdAt DateTime @default(now())
 
-model Comment {
-  id         Int      @id @default(autoincrement())
-  content    String
-  messageId  Int
-  created_at DateTime @default(now())
-  message    Message  @relation(fields: [messageId], references: [id])
-}
-
-model Track {
-  id                 Int     @id @default(autoincrement())
-  spotify_embed_link String
-  messageId          Int     @unique
-  message            Message @relation(fields: [messageId], references: [id])
+  @@map("comments")
 }
