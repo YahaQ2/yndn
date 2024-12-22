@@ -1,53 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const messageController = require('../controllers/controller');
-const commentController = require('../controllers/commentController');
 
 /**
  * @swagger
- * /api/messages/{id}:
- *   get:
- *     summary: Get a message by ID
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Successful response
- *       404:
- *         description: Message not found
- *       500:
- *         description: Server error
+ * tags:
+ *   name: Comments
+ *   description: API untuk mengelola komentar
  */
-router.get('/messages/:id', messageController.getMessage);
 
 /**
  * @swagger
- * /api/comments:
- *   get:
- *     summary: Get comments for a message
- *     parameters:
- *       - in: query
- *         name: messageId
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Successful response
- *       500:
- *         description: Server error
- */
-router.get('/comments', commentController.getComments);
-
-/**
- * @swagger
- * /api/comments:
+ * /comments:
  *   post:
- *     summary: Add a new comment
+ *     summary: Membuat komentar baru
+ *     tags: [Comments]
  *     requestBody:
  *       required: true
  *       content:
@@ -55,16 +21,52 @@ router.get('/comments', commentController.getComments);
  *           schema:
  *             type: object
  *             properties:
- *               messageId:
- *                 type: string
  *               content:
  *                 type: string
+ *                 description: Isi komentar
+ *               userId:
+ *                 type: string
+ *                 description: ID pengguna
+ *               messageId:
+ *                 type: string
+ *                 description: ID pesan
+ *             required:
+ *               - content
+ *               - userId
+ *               - messageId
  *     responses:
  *       201:
- *         description: Comment created successfully
+ *         description: Komentar berhasil dibuat
  *       500:
- *         description: Server error
+ *         description: Terjadi kesalahan
  */
-router.post('/comments', commentController.addComment);
+router.post('/comments', (req, res) => {
+  // Implementasi logika membuat komentar
+  res.status(201).json({ message: 'Komentar berhasil dibuat' });
+});
+
+/**
+ * @swagger
+ * /comments/{messageId}:
+ *   get:
+ *     summary: Mendapatkan semua komentar untuk pesan tertentu
+ *     tags: [Comments]
+ *     parameters:
+ *       - name: messageId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID pesan
+ *     responses:
+ *       200:
+ *         description: Daftar komentar
+ *       500:
+ *         description: Terjadi kesalahan
+ */
+router.get('/comments/:messageId', (req, res) => {
+  // Implementasi logika mendapatkan komentar
+  res.status(200).json({ comments: [] });
+});
 
 module.exports = router;
