@@ -3,10 +3,9 @@ const swaggerJSDoc = require('swagger-jsdoc');
 
 
 
-const path = require('path');export default async function handler(req, res) 
-
-const swaggerDefinition = {
-  res.status(200).json({
+const path = require('path');export default async function handler(req, res) {
+  res.status(200).json(
+    const swaggerDefinition = {
     openapi: "3.0.0",
     info: {
       title: "Comments API",
