@@ -5,7 +5,7 @@ info:
   version: 1.0.0
   description: API untuk mengelola pesan dan komentar menggunakan Supabase
 servers:
-  - url: https://yunand.vercel.app
+  - url: "https://yunand.vercel.app"
     description: API Production
 paths:
   /messages:
