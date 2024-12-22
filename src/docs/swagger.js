@@ -99,29 +99,6 @@ const swaggerDocument = {
       },
     },
     '/comments': {
-      post: {
-        summary: 'Tambah komentar baru',
-        requestBody: {
-          required: true,
-          content: {
-            'application/json': {
-              schema: { $ref: '#/components/schemas/NewComment' },
-            },
-          },
-        },
-        responses: {
-          '201': {
-            description: 'Komentar berhasil dibuat',
-            content: {
-              'application/json': {
-                schema: { $ref: '#/components/schemas/Comment' },
-              },
-            },
-          },
-        },
-      },
-    },
-    '/comments': {
       get: {
         summary: 'Ambil komentar berdasarkan ID pesan',
         parameters: [
@@ -142,6 +119,27 @@ const swaggerDocument = {
                   type: 'array',
                   items: { $ref: '#/components/schemas/Comment' },
                 },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        summary: 'Tambah komentar baru',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/NewComment' },
+            },
+          },
+        },
+        responses: {
+          '201': {
+            description: 'Komentar berhasil dibuat',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/Comment' },
               },
             },
           },
