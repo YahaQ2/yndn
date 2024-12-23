@@ -13,11 +13,11 @@
   "routes": [
     {
       "src": "/v1/api/(.*)",
-      "dest": "/src/server.js"
+      "dest": "/api/server.js"
     },
     {
       "src": "/api-docs",
-      "dest": "/src/server.js"
+      "dest": "/api/server.js"
     },
     {
       "src": "/swagger.json",
