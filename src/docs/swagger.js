@@ -1,7 +1,7 @@
 const path = require('path');
 const swaggerJSDoc = require('swagger-jsdoc');
 
-const swaggerDefinition = {
+export const swaggerDocument = {
   openapi: '3.0.0',
   info: {
     title: 'Menfess Comments API',
