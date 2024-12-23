@@ -17,7 +17,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/api/swagger.js"
+      "dest": "/public/swagger.html"
     }
   ]
 }
