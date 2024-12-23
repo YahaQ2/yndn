@@ -1,37 +1,76 @@
-const { supabase } = require('../database');
+import { prisma, supabase } from '../database.js'
 
-// Mendapatkan komentar berdasarkan `messageId`
-exports.getComments = async (req, res) => {
-  const { messageId } = req.query;
+export const commentsController = {
+  // Get all comments for a specific menfess
+  getComments: async (req, res) => {
+    try {
+      const { menfessId } = req.query
+      
+      if (!menfessId) {
+        return res.status(400).json({ error: 'Menfess ID is required' })
+      }
 
-  try {
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('messageId', parseInt(messageId))
-      .order('created_at', { ascending: true });
+      const comments = await prisma.comment.findMany({
+        where: {
+          menfessId: menfessId
+        },
+        orderBy: {
+          createdAt: 'desc'
+        }
+      })
 
-    if (error) throw error;
+      res.json(comments)
+    } catch (error) {
+      console.error('Error fetching comments:', error)
+      res.status(500).json({ error: 'Failed to fetch comments' })
+    }
+  },
 
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  // Create a new comment
+  createComment: async (req, res) => {
+    try {
+      const { content, menfessId, userName } = req.body
+
+      if (!content || !menfessId || !userName) {
+        return res.status(400).json({ 
+          error: 'Content, menfessId, and userName are required' 
+        })
+      }
+
+      // Get user ID from Supabase auth if available
+      const { user } = await supabase.auth.getUser()
+      const userId = user?.id
+
+      const comment = await prisma.comment.create({
+        data: {
+          content,
+          menfessId,
+          userName,
+          userId
+        }
+      })
+
+      res.status(201).json(comment)
+    } catch (error) {
+      console.error('Error creating comment:', error)
+      res.status(500).json({ error: 'Failed to create comment' })
+    }
+  },
+
+  // Delete a comment (optional - for moderation)
+  deleteComment: async (req, res) => {
+    try {
+      const { id } = req.params
+      
+      await prisma.comment.delete({
+        where: { id }
+      })
+
+      res.status(204).send()
+    } catch (error) {
+      console.error('Error deleting comment:', error)
+      res.status(500).json({ error: 'Failed to delete comment' })
+    }
   }
-};
+}
 
-// Menambahkan komentar baru
-exports.addComment = async (req, res) => {
-  const { messageId, content } = req.body;
-
-  try {
-    const { data, error } = await supabase
-      .from('comments')
-      .insert([{ messageId: parseInt(messageId), content }]);
-
-    if (error) throw error;
-
-    res.status(201).json(data[0]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
