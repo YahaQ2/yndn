@@ -7,7 +7,7 @@ export const swaggerDocument = {
   },
   servers: [
     {
-      url: '/api',
+      url: 'https://yunand.vercel.app',
       description: 'Development server',
     },
   ],
