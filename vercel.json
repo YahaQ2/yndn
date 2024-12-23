@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/server.js",
+      "src": "api/server.js",
       "use": "@vercel/node"
     },
     {
@@ -21,7 +21,7 @@
     },
     {
       "src": "/swagger.json",
-      "dest": "/src/server.js"
+      "dest": "/api/server.js"
     },
     {
       "src": "/(.*)",
