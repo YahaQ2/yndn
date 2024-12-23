@@ -1,3 +1,6 @@
+const path = require('path');
+const swaggerJSDoc = require('swagger-jsdoc');
+
 export const swaggerDocument = {
   openapi: '3.0.0',
   info: {
