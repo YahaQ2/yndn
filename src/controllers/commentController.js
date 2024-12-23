@@ -1,4 +1,5 @@
-import { prisma, supabase } from '../database.js'
+const supabase = require('../database');
+const { response } = require('../services/response');
 
 export const commentsController = {
   // Get all comments for a specific menfess
