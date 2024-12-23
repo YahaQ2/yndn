@@ -1,129 +1,105 @@
-const path = require('path');
-const swaggerJSDoc = require('swagger-jsdoc');
-
-// Swagger definition
-const swaggerDefinition = {
-  openapi: "3.0.0",
+export const swaggerDocument = {
+  openapi: '3.0.0',
   info: {
-    title: "Comments API",
-    version: "1.0.0",
-    description: "API for managing comments on messages",
+    title: 'Menfess Comments API',
+    version: '1.0.0',
+    description: 'API documentation for Menfess Comments system'
   },
+  servers: [
+    {
+      url: 'http://localhost:3000',
+      description: 'Development server'
+    }
+  ],
   paths: {
-    "/api/comments": {
-      post: {
-        summary: "Create a new comment",
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  content: { type: "string" },
-                  userId: { type: "string" },
-                  messageId: { type: "string" },
-                },
-                required: ["content", "userId", "messageId"],
-              },
-            },
-          },
-        },
-        responses: {
-          201: { description: "Comment created successfully" },
-          500: { description: "Error creating comment" },
-        },
-      },
+    '/api/comments': {
       get: {
-        summary: "Get all comments for a message",
+        summary: 'Get all comments for a menfess',
         parameters: [
           {
-            name: "messageId",
-            in: "query",
+            in: 'query',
+            name: 'menfessId',
             required: true,
-            schema: { type: "string" },
-          },
+            schema: {
+              type: 'string'
+            }
+          }
         ],
         responses: {
-          200: { description: "List of comments" },
-          500: { description: "Error fetching comments" },
-        },
+          '200': {
+            description: 'List of comments',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    $ref: '#/components/schemas/Comment'
+                  }
+                }
+              }
+            }
+          }
+        }
       },
-    },
-    "/api/comments/{id}": {
-      put: {
-        summary: "Update a comment",
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: { type: "integer" },
-          },
-        ],
+      post: {
+        summary: 'Create a new comment',
         requestBody: {
           required: true,
           content: {
-            "application/json": {
+            'application/json': {
               schema: {
-                type: "object",
-                properties: {
-                  content: { type: "string" },
-                  userId: { type: "string" },
-                },
-                required: ["content", "userId"],
-              },
-            },
-          },
+                $ref: '#/components/schemas/CommentInput'
+              }
+            }
+          }
         },
         responses: {
-          200: { description: "Comment updated successfully" },
-          403: { description: "Unauthorized" },
-          500: { description: "Error updating comment" },
-        },
-      },
-      delete: {
-        summary: "Delete a comment",
-        parameters: [
-          {
-            name: "id",
-            in: "path",
-            required: true,
-            schema: { type: "integer" },
-          },
-        ],
-        requestBody: {
-          required: true,
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  userId: { type: "string" },
-                },
-                required: ["userId"],
-              },
-            },
-          },
-        },
-        responses: {
-          204: { description: "Comment deleted successfully" },
-          403: { description: "Unauthorized" },
-          500: { description: "Error deleting comment" },
-        },
-      },
-    },
+          '201': {
+            description: 'Comment created successfully'
+          }
+        }
+      }
+    }
   },
-};
+  components: {
+    schemas: {
+      Comment: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string'
+          },
+          content: {
+            type: 'string'
+          },
+          menfessId: {
+            type: 'string'
+          },
+          userName: {
+            type: 'string'
+          },
+          createdAt: {
+            type: 'string',
+            format: 'date-time'
+          }
+        }
+      },
+      CommentInput: {
+        type: 'object',
+        required: ['content', 'menfessId', 'userName'],
+        properties: {
+          content: {
+            type: 'string'
+          },
+          menfessId: {
+            type: 'string'
+          },
+          userName: {
+            type: 'string'
+          }
+        }
+      }
+    }
+  }
+}
 
-// Setup swagger-jsdoc options
-const options = {
-  swaggerDefinition,
-  apis: [path.join(__dirname, '../controllers/*.js')], // Path to your API route files
-};
-
-// Generate swagger specification
-const swaggerSpec = swaggerJSDoc(options);
-
-// Export the swagger specification
-module.exports = swaggerSpec;
