@@ -2,21 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/**/*.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     },
     {
-      "src": "public/**",
+      "src": "public/swagger.html",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/v1/api/(.*)",
+      "src": "/v1/api/(route.js)",
       "dest": "/api/$1"
     },
     {
-      "src": "/(.*)",
+      "src": "/(index.js)",
       "dest": "/public/$1"
     }
   ]
