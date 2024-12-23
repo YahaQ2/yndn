@@ -6,17 +6,17 @@
       "use": "@vercel/node"
     },
     {
-      "src": "public/swagger.html",
+      "src": "public/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/v1/api/(route.js)",
+      "src": "/v1/api/(.*)",
       "dest": "/api/$1"
     },
     {
-      "src": "/(index.js)",
+      "src": "/(.*)",
       "dest": "/public/$1"
     }
   ]
