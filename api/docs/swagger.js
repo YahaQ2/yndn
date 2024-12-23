@@ -1,4 +1,6 @@
-export const swaggerDocument = {
+const swaggerJSDoc = require('swagger-jsdoc');
+
+const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
     title: 'Menfess Comments API',
@@ -79,3 +81,11 @@ export const swaggerDocument = {
     },
   },
 };
+const options = {
+  swaggerDefinition,
+  apis: ['./src/routes/*.js']
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
+module.exports = swaggerSpec;
