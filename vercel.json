@@ -1,36 +1,16 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "api/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "public/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/v1/api/(.*)",
-      "dest": "/api/server.js"
-    },
-    {
-      "src": "/api-docs",
-      "dest": "/api/server.js"
-    },
-    {
-      "src": "/swagger.json",
-      "dest": "/api/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
-  ],
-  "env": {
-    "DATABASE_URL": "@your_database_url",
-    "SUPABASE_URL": "@your_supabase_url",
-    "SUPABASE_ANON_KEY": "@your_supabase_anon_key"
+    "version": 2,
+    "builds": [
+      {
+        "src": "api/server.js",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "src/server.js"
+      }
+    ]
   }
-}
+  
