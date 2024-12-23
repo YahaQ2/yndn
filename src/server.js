@@ -1,37 +1,30 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const bodyParser = require('body-parser');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./doc/swagger'); // Mengimpor file swagger.js
-const routes = require('./routes/route'); // Pastikan file route.js Anda benar
-const { checkConnection } = require('./database'); // Pastikan file database.js benar
+import express from 'express'
+import cors from 'cors'
+import swaggerUi from 'swagger-ui-express'
+import { swaggerDocument } from './swagger.js'
+import commentsRouter from './routes/comments.routes.js'
 
-// Load environment variables
-dotenv.config();
+const app = express()
 
-// Membuat instance dari Express
-const app = express();
-const port = process.env.PORT || 3000;
+app.use(cors())
+app.use(express.json())
 
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Serve Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+app.get('/api-docs/swagger.json', (req, res) => {
+  res.json(swaggerDocument)
+})
 
-// Rute default
+// Serve static Swagger HTML
 app.get('/', (req, res) => {
-  res.send('Hello from Server Menfess');
-});
+  res.sendFile('swagger.html', { root: '.' })
+})
 
-// Setup Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// API routes
+app.use('/api', commentsRouter)
 
-// Menambahkan rute API
-app.use('/api', routes);
-
-// Memeriksa koneksi database
-checkConnection();
-
-// Menjalankan server
+const port = process.env.PORT || 3000
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+  console.log(`Server running on port ${port}`)
+})
+
