@@ -102,4 +102,13 @@ export const swaggerDocument = {
     }
   }
 }
+};
 
+const options = {
+  swaggerDefinition,
+  apis: [path.join(__dirname, '../controllers/*.js')],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
+module.exports = swaggerSpec
