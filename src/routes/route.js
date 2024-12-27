@@ -1,10 +1,21 @@
-onst express = require('express');
-const { commentsController } = require('../controllers/commentController');
+const express = require('express')
+const router = express.Router()
+const Controller = require('../controllers/controller')
+const MenfessController  = require('../controllers/commentController')
 
-const router = express.Router();
+// Routes Menfess
+router.get('/comments', commentController.getComments)
+router.post('/comments', Controller.createComments
+)
+// router.put('/menfess/:id', MenfessController.editMenfess)
+router.get('/comments/:id', Controller.getCommentsById)
+// router.delete('/menfess/:id', MenfessController.deleteMenfess)
 
-router.get('/comments', commentsController.getComments);
-router.post('/comments', commentsController.createComment);
-router.delete('/comments/:id', commentsController.deleteComment);
 
-module.exports = router;
+
+module.exports = router
+
+
+
+
+
