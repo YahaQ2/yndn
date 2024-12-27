@@ -1,10 +1,13 @@
-import { PrismaClient } from '@prisma/client';
-import { createClient } from '@supabase/supabase-js';
+const { PrismaClient } = require('@prisma/client');
+const { createClient } = require('@supabase/supabase-js');
 
 const prisma = new PrismaClient();
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
-export const commentsController = {
+const commentController = {
   getComments: async (req, res) => {
     try {
       const { menfessId } = req.query;
@@ -51,12 +54,28 @@ export const commentsController = {
     }
   },
 
+  getCommentById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const comment = await prisma.comments.findUnique({
+        where: { id: parseInt(id, 10) },
+      });
+
+      if (!comment) {
+        return res.status(404).json({ error: 'Comment not found' });
+      }
+
+      res.json(comment);
+    } catch (error) {
+      console.error('Error fetching comment:', error);
+      res.status(500).json({ error: 'Failed to fetch comment' });
+    }
+  },
+
   deleteComment: async (req, res) => {
     try {
       const { id } = req.params;
-
       await prisma.comments.delete({ where: { id: parseInt(id, 10) } });
-
       res.status(204).send();
     } catch (error) {
       console.error('Error deleting comment:', error);
@@ -64,3 +83,5 @@ export const commentsController = {
     }
   },
 };
+
+module.exports = commentController;
