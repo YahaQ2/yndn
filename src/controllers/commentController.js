@@ -32,7 +32,7 @@ const commentController = {
     try {
       const { content, menfessId, userName } = req.body;
 
-      if (!content || !menfessId || !userName) {
+      if (!content || !menfessId || !userId) {
         return res.status(400).json({ error: 'All fields are required' });
       }
 
