@@ -9,9 +9,11 @@ datasource db {
 
 model Comments {
   id        Int      @id @default(autoincrement())
-  content   String
-  userId    String   // UUID dari user yang mengomentari
-  messageId String   // UUID dari menfess/message
+  content   String   @("content")
+  userId    String   @("userId")
+  // UUID dari user yang mengomentari
+  messageId String   @("messageId")
+  // UUID dari menfess/message
   createdAt DateTime @default(now())
 
   @@map("comments")
