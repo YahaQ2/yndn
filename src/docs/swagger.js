@@ -31,10 +31,7 @@ const swaggerDefinition = {
             schema: {
               type: 'object',
               properties: {
-                message: {
-                  type: 'string',
-                  example: 'Resource not found',
-                },
+                message: { type: 'string', example: 'Resource not found' },
               },
             },
           },
@@ -47,10 +44,7 @@ const swaggerDefinition = {
             schema: {
               type: 'object',
               properties: {
-                message: {
-                  type: 'string',
-                  example: 'Internal server error',
-                },
+                message: { type: 'string', example: 'Internal server error' },
               },
             },
           },
@@ -58,57 +52,54 @@ const swaggerDefinition = {
       },
     },
     schemas: {
-      comments: {
+      Comment: { // 🔴 Diubah ke PascalCase (best practice)
         type: 'object',
         properties: {
           id: {
             type: 'integer',
-            description: 'ID menfess yang unik',
+            description: 'ID komentar yang unik',
             example: 1,
           },
           content: {
             type: 'string',
-            description: 'Pengirim menfess',
-            example: 'user123',
+            description: 'Isi komentar',
+            example: "Ini adalah komentar untuk menfess!"
           },
           messageId: {
-            type: 'string',
-            description: 'Pesan dari menfess',
-            example: 'Halo, ini pesan menfess!'
-    
+            type: 'integer', // 🔴 Diubah ke integer
+            description: 'ID pesan yang dikomentari',
+            example: 123,
           },
           createdAt: {
             type: 'string',
             format: 'date-time',
-            description: 'Tanggal dan waktu saat menfess dibuat',
-            example: '2024-12-17T10:00:00Z',
+            description: 'Waktu pembuatan komentar',
+            example: '2024-01-01T12:00:00Z', // 🔴 Format ISO 8601
           },
           updatedAt: {
             type: 'string',
             format: 'date-time',
-            description: 'Tanggal dan waktu saat menfess terakhir diperbarui',
-            example: '2024-12-17T12:00:00Z',
+            description: 'Waktu terakhir komentar diperbarui',
+            example: '2024-01-01T12:30:00Z',
           },
         },
       },
     },
   },
   security: [
-    {
-      BearerAuth: [],
-    },
+    { BearerAuth: [] },
   ],
   tags: [
     {
       name: 'comments',
-      description: 'Endpoint terkait dengan comments',
+      description: 'Operasi terkait komentar',
     },
   ],
 };
 
 const options = {
   swaggerDefinition,
-  apis: [path.join(__dirname, '../controllers/*.js')], // Pastikan lokasi file controller sesuai
+  apis: [path.join(__dirname, '../controllers/*.js')], // Pastikan controller ada
 };
 
 const swaggerSpec = swaggerJSDoc(options);
